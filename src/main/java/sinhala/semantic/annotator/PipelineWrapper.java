@@ -12,7 +12,6 @@ import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
 import is2.data.SentenceData09;
 import is2.lemmatizer.Lemmatizer;
-import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -249,7 +248,7 @@ class PipelineWrapper {
 //            String[] wordList = text.split(" ");
             Sentence parse = new Sentence();
 //            Map PosTagMap = this.getSinhalaPosTag(text);
-            Pair<List, Map> result = this.identifyCompoundVerbs(text);      // identify compound verbs in sentence
+            Map.Entry<List, Map> result = this.identifyCompoundVerbs(text);      // identify compound verbs in sentence
             List tokenList = result.getKey();
             Map posTagMap = result.getValue();
 
@@ -280,7 +279,7 @@ class PipelineWrapper {
      * @param sentence Sinhala Sentence
      * @return pair object of wordlist, Map of tokens and their pos tags
      */
-    private Pair<List, Map> identifyCompoundVerbs(String sentence) {
+    private Map.Entry<List, Map> identifyCompoundVerbs(String sentence) {
         logger.info("Finding compound verbs");
         String str[] = sentence.split(" ");     // Whitespace tokenizing
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
@@ -347,13 +346,13 @@ class PipelineWrapper {
 
             }
 
-            return new Pair<>(wordList, pos2Word);
+            return new AbstractMap.SimpleEntry<>(wordList, pos2Word);
 
         } else {
             for (String word : wordList) {
                 pos2Word.put(word, posTagMap.get(word));     // Return as it is
             }
-            return new Pair<>(wordList, pos2Word);
+            return new AbstractMap.SimpleEntry<>(wordList,pos2Word);
         }
     }
 

@@ -285,7 +285,7 @@ class PipelineWrapper {
         String str[] = sentence.split(" ");     // Whitespace tokenizing
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
         Map<String, String> posTagMap = this.getSinhalaPosTag(sentence);        // Postags for each word in sentence
-        List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP", "NCV", "JCV", "RPCV", "SVCV");     // Tag set to identify compound verbs
+        List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP", "NCV", "JCV", "RPCV", "SVCV");     // NCV Tag set to identify compound verbs
         ArrayList<String> compVerbWords = new ArrayList<>();        // Words that have above verb tags as pos
         ArrayList<String> compVerbs = new ArrayList<>();        // Identified compound verbs
         ArrayList<String> compVerbObject = new ArrayList<>();       // List to store words of each compound verb

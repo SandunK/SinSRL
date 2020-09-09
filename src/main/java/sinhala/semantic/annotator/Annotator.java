@@ -122,8 +122,8 @@ public class Annotator {
         parallelSentence_srlonly.align(languageDAO.getAligner(targetLanguage));
         transfer.transferShallowSemantics(parallelSentence_srlonly);
 
-        logger.debug(parallelSentence_srlonly.toString());
-        logger.debug(parsedTL);
+//        logger.debug(parallelSentence_srlonly.toString());
+//        logger.debug(parsedTL);
 
         BiSentence parallelSentence_projected = new BiSentence(parsedSL, parsedTL);
         parallelSentence_projected.copyAlignments(parallelSentence_srlonly);

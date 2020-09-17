@@ -316,7 +316,7 @@ public class Token implements Comparable<Token> {
         if (this.getLemma().equals("--")) return true;
         if (this.getPosUniversal().equals("PUNCT")) return true;
 //        if (this.getDeprel().equals("det") && !this.getPos().startsWith("N")) return true;
-        if (this.getDeprel().equals("case")) return true;
+//        if (this.getDeprel().equals("case")) return true;
 
         return false;
     }

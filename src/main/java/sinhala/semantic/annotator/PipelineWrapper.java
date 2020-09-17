@@ -252,11 +252,38 @@ class PipelineWrapper {
             List tokenList = result.getKey();
             Map posTagMap = result.getValue();
 
-            for (Object word : tokenList) {
+            for (Object Word : tokenList) {
+                String pos = (String) posTagMap.get(Word);
+                String word = (String) Word;
+                if (pos.contains("V") && word.startsWith("නො")){
+                    JSONObject splitterResult = this.getBaseWord(word);
 
-                Token newtoken = parse.newToken().setText((String) word).setPos((String) posTagMap.get(word));
-                String base = this.getBaseWord((String) word); // get base word eg:දරුවාට base:දරුවා
-                newtoken.setLemma(base);
+                    if (splitterResult == null){
+                        Token newtoken = parse.newToken().setText(word).setPos(pos);
+                        newtoken.setLemma("-");
+                    } else {
+                        List debugList = (List) splitterResult.get("debug");
+                        for (Object instance:debugList){
+                            List listInstance = (List) instance;
+                            String prefix = (String) listInstance.get(0);
+                            String base = (String) listInstance.get(1);
+                            if (prefix.equals("නො")){
+                                Token newtoken = parse.newToken().setText(prefix).setPos("DT");
+                                Token newtoken2 = parse.newToken().setText(base).setPos(pos);
+                            }
+                        }
+                    }
+
+                } else {
+                    Token newtoken = parse.newToken().setText(word).setPos(pos);
+                    JSONObject splitterResult = this.getBaseWord(word); // get base word eg:දරුවාට base:දරුවා
+                    if (splitterResult == null){
+                        newtoken.setLemma("-");
+                    } else {
+                        newtoken.setLemma((String) splitterResult.get("base"));
+                    }
+
+                }
                 // Determine universal dependencies from tagset
                 toUniversalDependencies(parse);
 
@@ -284,7 +311,7 @@ class PipelineWrapper {
         String str[] = sentence.split(" ");     // Whitespace tokenizing
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
         Map<String, String> posTagMap = this.getSinhalaPosTag(sentence);        // Postags for each word in sentence
-        List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP", "NCV", "JCV", "RPCV", "SVCV");     // NCV Tag set to identify compound verbs
+        List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP","NCV","JCV", "RPCV", "SVCV","VBZ");     // NCV Tag set to identify compound verbs
         ArrayList<String> compVerbWords = new ArrayList<>();        // Words that have above verb tags as pos
         ArrayList<String> compVerbs = new ArrayList<>();        // Identified compound verbs
         ArrayList<String> compVerbObject = new ArrayList<>();       // List to store words of each compound verb
@@ -294,6 +321,10 @@ class PipelineWrapper {
         for (String word : wordList) {
             assert posTagMap != null;
             String pos = posTagMap.get(word);       // get words containing above tags
+//            if (pos.equals("POST")){
+//                pos = "IN";
+//                posTagMap.put(word,pos);
+//            }
             if (verbTags.contains(pos)) {
                 compVerbWords.add(word);
             }
@@ -356,6 +387,11 @@ class PipelineWrapper {
         }
     }
 
+    /**
+     * Method to get English SRL from AllenNLP Toolkit
+     * @param sentence sentence to annotate
+     * @return  Json object of SRL
+     */
     private JSONObject getEnglishSRL(String sentence) {
         String url = "https://demo.allennlp.org/api/semantic-role-labeling/predict";
         Map<String, String> obj = new HashMap<>();
@@ -421,7 +457,7 @@ class PipelineWrapper {
      *
      * @param word original word
      */
-    private String getBaseWord(String word) {
+    private JSONObject getBaseWord(String word) {
 
         Properties props = this.loadPropFile();
         String postUrl = "http://" + props.getProperty("serverAddress") + "/splitt";// put in your url
@@ -430,13 +466,14 @@ class PipelineWrapper {
             obj.put("word", word);
             String jsonText = JSONValue.toJSONString(obj);
             System.out.println(jsonText);
-            JSONObject result = this.makeHttpPost(postUrl, jsonText);
-            if (result != null) {
-                System.out.println((String) result.get("base"));
-                return (String) result.get("base");
-            }
+            return this.makeHttpPost(postUrl, jsonText);
+//            if (result != null) {
+//                System.out.println((String) result.get("base"));
+//                return (String) result.get("base");
+//            }
         }
-        return "-";
+//        return "-";
+        return null;
     }
 
 

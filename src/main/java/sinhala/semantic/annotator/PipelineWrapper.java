@@ -149,7 +149,6 @@ class PipelineWrapper {
             for (CoreMap sentence : sentences) {
 
                 Sentence parse = new Sentence();
-                sentencetoParse = parse.toSentence();
                 // traversing the words in the current sentence
                 // a CoreLabel is a CoreMap with additional token-specific methods
 
@@ -219,7 +218,7 @@ class PipelineWrapper {
                     }
                     s.setHeadsAndDeprels(heads, parse.getDeprels().toArray(new String[parse.getDeprels().size()]));
                     semanticRoleLabeler.parseSentence(s);
-
+                    sentencetoParse = parse.toSentence();
                     JSONObject englishSRL = this.getEnglishSRL(sentencetoParse); // get English SRL from AllenNLP
                     assert englishSRL != null;
                     ArrayList verbs = (ArrayList) englishSRL.get("verbs");
@@ -323,6 +322,7 @@ class PipelineWrapper {
         logger.info("Finding compound verbs");
         String str[] = sentence.split(" ");     // Whitespace tokenizing
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
+        wordList.removeIf(t -> t.equals("")); // remove spaces in the middle of a sentence
         Map<String, String> posTagMap = this.getSinhalaPosTag(sentence);        // Postags for each word in sentence
         List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP","NCV","JCV", "RPCV","RRPCV", "SVCV","VBZ");     // NCV Tag set to identify compound verbs
         ArrayList<String> compVerbWords = new ArrayList<>();        // Words that have above verb tags as pos
@@ -493,13 +493,15 @@ class PipelineWrapper {
      */
     private Map<String, String> getSinhalaPosTag(String text) {
 
-        String[] wordList = text.split(" ");
+        String str[] = text.split(" ");     // Whitespace tokenizing
+        List<String> wordList = new ArrayList<>(Arrays.asList(str));
+        wordList.removeIf(t -> t.equals("")); // remove spaces in the middle of a sentence
         Properties props = this.loadPropFile();
         String postUrl = "http://" + props.getProperty("serverAddress") + ":3000/getpos";// put in your url
         Map<String, String> postagMap = new HashMap<String, String>();
-
+        String sentence = String.join(" ",wordList);
         Map<String, String> postJson = new HashMap<String, String>();
-        postJson.put("sentence", text);
+        postJson.put("sentence", sentence);
         String jsonText = JSONValue.toJSONString(postJson);         // Create POST request json string
 
         JSONObject result = this.makeHttpPost(postUrl, jsonText);    // Call http post request and get results

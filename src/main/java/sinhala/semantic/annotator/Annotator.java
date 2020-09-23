@@ -10,9 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Annotator {
     private static final Logger logger = LogManager.getLogger(Annotator.class);
@@ -51,9 +49,8 @@ public class Annotator {
                 String targetSentence = siReader.nextLine();
                 String sourceSentence = enReader.nextLine();
 
-                Sentence parsedSL = slPipeline.parse(sourceSentence.trim());
-
-                Sentence parsedTL = tlPipeline.parse(targetSentence.trim());
+                Sentence parsedSL = slPipeline.parse(removePunctuations(sourceSentence).trim());
+                Sentence parsedTL = tlPipeline.parse(removePunctuations(targetSentence).trim());
                 alignAndProject(parsedSL, parsedTL, Language.SINHALA);
 
             }
@@ -64,6 +61,23 @@ public class Annotator {
         } catch (FileNotFoundException e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Method to replace punctuations with a space
+     * @param sentence input sentence
+     * @return sentence without punctuations
+     */
+    private static String removePunctuations(String sentence){
+        Map<Character, Character> replacements = new HashMap<>();
+        replacements.put('.', ' ');
+        replacements.put('!', ' ');
+
+        StringBuilder output = new StringBuilder();
+        for (Character c : sentence.toCharArray()) {
+            output.append(replacements.getOrDefault(c, c));
+        }
+        return output.toString();
     }
 
     /**

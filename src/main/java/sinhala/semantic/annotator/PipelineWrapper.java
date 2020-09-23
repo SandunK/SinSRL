@@ -131,6 +131,7 @@ class PipelineWrapper {
      * @return Parsed sentence.
      */
     Sentence parse(String text) {
+        String sentencetoParse = text;
         if (text.trim().equals("")) {
             return new Sentence();
         }
@@ -148,7 +149,7 @@ class PipelineWrapper {
             for (CoreMap sentence : sentences) {
 
                 Sentence parse = new Sentence();
-
+                sentencetoParse = parse.toSentence();
                 // traversing the words in the current sentence
                 // a CoreLabel is a CoreMap with additional token-specific methods
 
@@ -219,7 +220,7 @@ class PipelineWrapper {
                     s.setHeadsAndDeprels(heads, parse.getDeprels().toArray(new String[parse.getDeprels().size()]));
                     semanticRoleLabeler.parseSentence(s);
 
-                    JSONObject englishSRL = this.getEnglishSRL(text); // get English SRL from AllenNLP
+                    JSONObject englishSRL = this.getEnglishSRL(sentencetoParse); // get English SRL from AllenNLP
                     assert englishSRL != null;
                     ArrayList verbs = (ArrayList) englishSRL.get("verbs");
                     ArrayList words = (ArrayList) englishSRL.get("words");
@@ -246,15 +247,27 @@ class PipelineWrapper {
         } else {    // For sinhala language
 
 //            String[] wordList = text.split(" ");
+            Boolean isVerbIdentified = false;
             Sentence parse = new Sentence();
 //            Map PosTagMap = this.getSinhalaPosTag(text);
-            Map.Entry<List, Map> result = this.identifyCompoundVerbs(text);      // identify compound verbs in sentence
-            List tokenList = result.getKey();
-            Map posTagMap = result.getValue();
+            Map.Entry<List<String>, Map<String, String>> result = this.identifyCompoundVerbs(text);      // identify compound verbs in sentence
+            ArrayList<String> tokenList = (ArrayList<String>) result.getKey();
+            Map<String, String> posTagMap = result.getValue();
 
-            for (Object Word : tokenList) {
-                String pos = (String) posTagMap.get(Word);
-                String word = (String) Word;
+            for(Object pos: posTagMap.values()){
+                String posStr = (String) pos;           // check whether sentence have a verb. (We assuemes sentence without verb in sinhala as sentences with be worbs in english)
+                if (posStr.contains("V")){
+                    isVerbIdentified = true;
+                    break;
+                }
+            }
+
+            if (!isVerbIdentified) {
+                tokenList.add("*");
+                posTagMap.put("*","VERB");
+            }
+            for (String word : tokenList) {
+                String pos = posTagMap.get(word);
                 if (pos.contains("V") && word.startsWith("නො")){
                     JSONObject splitterResult = this.getBaseWord(word);
 
@@ -306,12 +319,12 @@ class PipelineWrapper {
      * @param sentence Sinhala Sentence
      * @return pair object of wordlist, Map of tokens and their pos tags
      */
-    private Map.Entry<List, Map> identifyCompoundVerbs(String sentence) {
+    private Map.Entry<List<String>, Map<String, String>> identifyCompoundVerbs(String sentence) {
         logger.info("Finding compound verbs");
         String str[] = sentence.split(" ");     // Whitespace tokenizing
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
         Map<String, String> posTagMap = this.getSinhalaPosTag(sentence);        // Postags for each word in sentence
-        List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP","NCV","JCV", "RPCV", "SVCV","VBZ");     // NCV Tag set to identify compound verbs
+        List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP","NCV","JCV", "RPCV","RRPCV", "SVCV","VBZ");     // NCV Tag set to identify compound verbs
         ArrayList<String> compVerbWords = new ArrayList<>();        // Words that have above verb tags as pos
         ArrayList<String> compVerbs = new ArrayList<>();        // Identified compound verbs
         ArrayList<String> compVerbObject = new ArrayList<>();       // List to store words of each compound verb
@@ -321,10 +334,6 @@ class PipelineWrapper {
         for (String word : wordList) {
             assert posTagMap != null;
             String pos = posTagMap.get(word);       // get words containing above tags
-//            if (pos.equals("POST")){
-//                pos = "IN";
-//                posTagMap.put(word,pos);
-//            }
             if (verbTags.contains(pos)) {
                 compVerbWords.add(word);
             }

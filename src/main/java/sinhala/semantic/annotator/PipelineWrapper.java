@@ -35,6 +35,8 @@ import org.apache.logging.log4j.Logger;
 import javax.json.JsonObject;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
 /**
@@ -68,7 +70,7 @@ class PipelineWrapper {
     PipelineWrapper(Language language) {
 
         this.language = language;
-        String languageString = language.toString().substring(0, 1).toUpperCase() + language.toString().substring(1).toLowerCase();
+//        String languageString = language.toString().substring(0, 1).toUpperCase() + language.toString().substring(1).toLowerCase();
 
         //---------------------------------
         // StanfordNLP
@@ -82,45 +84,6 @@ class PipelineWrapper {
 
             // initialize STANFORD NLP
             pipeline = new StanfordCoreNLP(props);
-
-
-            //---------------------------------
-            // MATE tools
-            //---------------------------------
-            // use MATE semantic role labeler for English
-            if (language.equals(Language.ENGLISH)) {
-
-                se.lth.cs.srl.languages.Language.setLanguage(se.lth.cs.srl.languages.Language.L.eng);
-
-                // init MateSRL for English
-                ZipFile zipFile = null;
-                try {
-                    String srlModel = "srl-english.model";
-                    InputStream cpResource = this.getClass().getClassLoader().getResourceAsStream("models/" + srlModel);
-                    System.out.println("cpResource = " + cpResource);
-                    if (cpResource != null) {
-                        File tmpFile = null;
-                        try {
-                            tmpFile = File.createTempFile("file", "temp");
-                            FileUtils.copyInputStreamToFile(cpResource, tmpFile); // FileUtils from apache-io
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        if (tmpFile != null)
-                            try {
-                                String absolutePath = tmpFile.getAbsolutePath();
-                                zipFile = new ZipFile(absolutePath);
-                                semanticRoleLabeler = Pipeline.fromZipFile(zipFile);
-                                zipFile.close();
-                            } finally {
-                                boolean delete = tmpFile.delete();
-                            }
-                    }  // print warning
-
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
@@ -173,15 +136,6 @@ class PipelineWrapper {
                     }
                 }
 
-                // this is the Stanford dependency graph of the current sentence
-                SemanticGraph dependencies = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
-
-                for (SemanticGraphEdge semanticGraphEdge : dependencies.edgeIterable()) {
-
-                    parse.getToken(semanticGraphEdge.getDependent().index()).setDeprel(semanticGraphEdge.getRelation().getShortName());
-                    parse.getToken(semanticGraphEdge.getDependent().index()).setHeadId(semanticGraphEdge.getGovernor().index());
-                }
-
                 // Determine universal dependencies from tagset
                 toUniversalDependencies(parse);
 
@@ -189,26 +143,7 @@ class PipelineWrapper {
                     if (token.getHeadId() == 0) token.setDeprel("root");
                 }
 
-                // use MATE lemmatizer for non-English
-                if (!language.equals(Language.ENGLISH) && !language.equals(Language.CHINESE)) {
-
-                    SentenceData09 sentenceData09 = new SentenceData09();
-                    sentenceData09.init(("<root> <root> " + Joiner.on(" ").join(parse.getTexts())).split(" "));
-                    sentenceData09 = lemmatizer.apply(sentenceData09);
-
-                    for (int k = 1; k < sentenceData09.length(); k++) {
-                        parse.getToken(k)
-                                .setLemma(sentenceData09.plemmas[k]);
-                    }
-                }
-
-                // Only English currently has SRL
-                if (language.equals(Language.ENGLISH) && semanticRoleLabeler != null) {
-                    se.lth.cs.srl.corpus.Sentence s = new se.lth.cs.srl.corpus.Sentence(
-                            prepareFields(parse.getTexts()),
-                            prepareFields(parse.getLemmas()),
-                            prepareFields(parse.getPos()),
-                            prepareFields(parse.getMorph()));
+                if (language.equals(Language.ENGLISH)) {
 
                     int size = parse.getHeadIds().size();
                     int[] heads = new int[size];
@@ -216,22 +151,23 @@ class PipelineWrapper {
                     for (int n = 0; n < size; ++n) {
                         heads[n] = temp[n];
                     }
-                    s.setHeadsAndDeprels(heads, parse.getDeprels().toArray(new String[parse.getDeprels().size()]));
-                    semanticRoleLabeler.parseSentence(s);
+
                     sentencetoParse = parse.toSentence();
+                    ArrayList<ArrayList<String>> predicates = this.getPredicates(sentencetoParse);
                     JSONObject englishSRL = this.getEnglishSRL(sentencetoParse); // get English SRL from AllenNLP
                     assert englishSRL != null;
                     ArrayList verbs = (ArrayList) englishSRL.get("verbs");
                     ArrayList words = (ArrayList) englishSRL.get("words");
 
-                    for (Predicate p : s.getPredicates()) {
-                        Frame frame = parse.getToken(p.getIdx()).addNewFrame(p.getSense());
+                    assert predicates != null;
+                    for (ArrayList<String> p : predicates) {
+                        Frame frame = parse.getToken(words.indexOf(p.get(0))+1).addNewFrame(p.get(1));
 
                         for (Object verbObject : verbs) {
                             JSONObject verbJson = (JSONObject) verbObject;
                             String verb = (String) verbJson.get("verb");
 
-                            if (verb.equals(p.getForm())) {
+                            if (verb.equals(p.get(0))) {
                                 for (Token token : parse.getTokens()) {
                                     ArrayList tags = (ArrayList) verbJson.get("tags");
                                     String tag = (String) tags.get(words.indexOf(token.getText()));
@@ -310,6 +246,47 @@ class PipelineWrapper {
         }
 
         return null;
+    }
+
+    /**
+     * Get predicates from a sentence
+     * @param sentence sentence to tag
+     * @return predicat arraylist
+     */
+    private ArrayList<ArrayList<String>> getPredicates (String sentence){
+        ArrayList<ArrayList<String>> predicates = new ArrayList<>();
+        Properties props = this.loadPropFile();
+        String postUrl = "http://" + props.getProperty("serverAddress") + "/getpredicates";// put in your url
+        Map<String, String> obj = new HashMap<>();
+        obj.put("word", sentence);
+        String jsonText = JSONValue.toJSONString(obj);
+        System.out.println("Requesting English predicates from flair...");
+        try {
+            JSONObject result = this.makeHttpPost(postUrl, jsonText);
+            assert result != null;
+            String sentenceStr = result.get("sentence").toString();     // Predicate tagged sentence
+            List<String> words = Arrays.asList(sentenceStr.split(" "));
+            // Filter predicates
+            String pattern = "\\<(.+?)\\>";
+//            String pattern = "(?<=\\<)(\\s*.*\\s*)(?=\\>)";
+            Pattern p = Pattern.compile(pattern);
+            Matcher m = p.matcher(sentenceStr);
+            while (m.find()) {
+                ArrayList<String> predicateWithForms = new ArrayList<>();
+                String predicate=m.group();
+                System.out.println(predicate);
+                String verb = words.get(words.indexOf(predicate)-1); // get actual word of the predicate
+                predicateWithForms.add(verb);
+                predicateWithForms.add(predicate.substring(1,predicate.length()-1)); // <predicate.01> --> predicate.01
+                predicates.add(predicateWithForms);
+            }
+            return predicates;
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 
     /**
@@ -410,9 +387,6 @@ class PipelineWrapper {
         System.out.println("Requesting English SRL from AllenNLP");
         try {
             JSONObject result = this.makeHttpPost(url, jsonText);
-//            assert result != null;
-//            resultMap.put("verbs",(ArrayList) result.get("verbs"));
-//            resultMap.put("words",(ArrayList) result.get("words"));
             return result;
 
         } catch (NullPointerException e) {
@@ -469,7 +443,7 @@ class PipelineWrapper {
     private JSONObject getBaseWord(String word) {
 
         Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + "/splitt";// put in your url
+        String postUrl = "http://" + props.getProperty("serverAddress") + ":3000/split";// put in your url
         if (word.length() > 1) {
             Map<String, String> obj = new HashMap<>();
             obj.put("word", word);

@@ -57,7 +57,7 @@ class PipelineWrapper {
 
     private Logger logger = LogManager.getLogger(LanguageDAO.class);
 
-    private String serverAddress = "35.224.254.129";
+    private String serverAddress = "34.69.112.21";
 
     /**
      * Constructor for pipeline object. Require language to be specified.

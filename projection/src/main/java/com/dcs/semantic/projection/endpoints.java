@@ -2,10 +2,7 @@ package com.dcs.semantic.projection;
 
 import com.dcs.semantic.projection.process.Annotator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +23,7 @@ public class endpoints {
         return "I am Ok";
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("project")
     public Map<String, String> project(@RequestBody Map<String, String> payload) {
         System.out.println("Inside Sinhala SRL Projector ...");

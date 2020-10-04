@@ -256,7 +256,7 @@ class PipelineWrapper {
     private ArrayList<ArrayList<String>> getPredicates (String sentence){
         ArrayList<ArrayList<String>> predicates = new ArrayList<>();
         Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + "/getpredicates";// put in your url
+        String postUrl = "http://" + props.getProperty("serverAddress") + ":3001/getpredicates";// put in your url
         Map<String, String> obj = new HashMap<>();
         obj.put("word", sentence);
         String jsonText = JSONValue.toJSONString(obj);
@@ -471,7 +471,7 @@ class PipelineWrapper {
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
         wordList.removeIf(t -> t.equals("")); // remove spaces in the middle of a sentence
         Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + ":3000/getpos";// put in your url
+        String postUrl = "http://" + props.getProperty("serverAddress") + ":3002/getpos";// put in your url
         Map<String, String> postagMap = new HashMap<String, String>();
         String sentence = String.join(" ",wordList);
         Map<String, String> postJson = new HashMap<String, String>();

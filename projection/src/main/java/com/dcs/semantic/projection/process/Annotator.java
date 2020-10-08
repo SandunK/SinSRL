@@ -12,11 +12,10 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
-@Controller
+@Configuration
 public class Annotator {
     private static final Logger logger = LogManager.getLogger(Annotator.class);
     private static LanguageDAO languageDAO = LanguageDAO.getInstance();

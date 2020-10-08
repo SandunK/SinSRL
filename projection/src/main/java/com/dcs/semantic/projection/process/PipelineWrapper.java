@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 //import se.lth.cs.srl.SemanticRoleLabeler;
 
@@ -40,11 +39,10 @@ import java.util.regex.Pattern;
  * <p>
  * Created by Alan Akbik on 8/28/17.
  */
-
 class PipelineWrapper {
 
     // Language of this pipeline, defaults to English.
-    private Language language = Language.ENGLISH;
+    private Language language;
 
     // Anna lemmatizer for this pipeline (note: some languages such as Chinese do not have lemmatizers)
     private Lemmatizer lemmatizer;
@@ -57,13 +55,16 @@ class PipelineWrapper {
 
     private Logger logger = LogManager.getLogger(LanguageDAO.class);
 
-    private String serverAddress = "34.69.112.21";
+//    private String serverAddress;
+
+    private String serverAddress = "34.123.37.137";
 
     /**
      * Constructor for pipeline object. Require language to be specified.
      *
      * @param language Target language for this pipeline.
      */
+
     PipelineWrapper(Language language) {
 
         this.language = language;

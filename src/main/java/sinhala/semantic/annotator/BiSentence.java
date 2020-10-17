@@ -10,6 +10,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import javax.json.JsonObject;
 import java.util.*;
 
 /**
@@ -190,6 +191,7 @@ public class BiSentence {
 
     }
 
+
     /**
      * Write output semantic frames into a csv file
      */
@@ -211,7 +213,7 @@ public class BiSentence {
                     if (frame.hasTokenRole(tl)) {
                         if (tl.evokesFrame()) {
                             String roleLabel = frame.getTokenRole(tl);
-                            if (roleLabel.equals("B-V")){
+                            if (roleLabel.equals("B-V")) {
                                 tokenJsonObj.put("text", tl.getText());
                                 tokenJsonObj.put("frame", tl.getFrame().getLabel());
                                 if (!frameLst.contains(tl.getFrame().getLabel())) {          // Check whether frame label available to avoid repetition
@@ -253,7 +255,8 @@ public class BiSentence {
                     e.printStackTrace();
                 }
             }
-            return jsonLst;
+            return processMissingTags(jsonLst);
+//            return jsonLst;
         } catch (NullPointerException e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
             System.out.println("Invalid language definition!");
@@ -261,9 +264,114 @@ public class BiSentence {
         }
     }
 
-//    /*
-//           to csv
-//         */
+    /**
+     * Method to process missing tags
+     * @param jsonLst json object list for tokens
+     * @return processed json list
+     */
+    public ArrayList<JSONObject> processMissingTags(ArrayList<JSONObject> jsonLst) {
+//    private void processMissingTags(ArrayList<JSONObject> jsonLst) {
+        ArrayList<Integer> missingIndexes = new ArrayList<>();
+        JSONParser parser = new JSONParser();
+
+        for (JSONObject token : jsonLst) {
+            if (token.get("frame").equals("[_]")) {
+                missingIndexes.add(jsonLst.indexOf(token));
+            }
+        }
+
+        List<List<Integer>> ranges = getConsecutiveRanges(missingIndexes);
+
+        for (List<Integer> range:ranges){
+            if (range.size()==0){
+                continue;
+            } else if(range.size()==1){
+                Integer index = range.get(0);
+                String prevTag = (String) jsonLst.get(index-1).get("frame");
+                String afterTag = (String) jsonLst.get(index+1).get("frame");
+                if (prevTag.equals(afterTag)){
+                    String tags = prevTag.substring(0,prevTag.length());
+                }
+            } else {
+                Integer startIndex = range.get(0);
+                Integer endIndex = range.get(1);
+                String prevTag = (String) jsonLst.get(startIndex-1).get("frame");
+                String afterTag = (String) jsonLst.get(endIndex+1).get("frame");
+                prevTag = prevTag.substring(prevTag.indexOf("-")+1,prevTag.length()-1);
+                afterTag = afterTag.substring(afterTag.indexOf("-")+1,afterTag.length()-1);
+                if (prevTag.equals(afterTag)){
+                    for (int i = startIndex;i<=endIndex;i++){
+                        JSONObject tokenObject = jsonLst.get(i);
+                        Map<String, String> tokenJsonObj = new HashMap<>();
+                        tokenJsonObj.put("text", (String) tokenObject.get("text"));
+                        tokenJsonObj.put("frame", "[I-"+prevTag+"]");
+
+                        try {
+                            jsonLst.add(i,(JSONObject) parser.parse(JSONValue.toJSONString(tokenJsonObj)));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+        }
+        return jsonLst;
+    }
+
+    /**
+     * Method to find consecutive index ranges
+     * @param a integer list
+     * @return list of lists containing ranges
+     */
+    static List<List<Integer>> getConsecutiveRanges ( ArrayList<Integer> a){
+        int length = 1;
+        List<List<Integer>> list = new ArrayList<List<Integer>>();
+        // If the array is empty,
+        // return the list
+        if (a.size() == 0) {
+            return list;
+        }
+
+        // Traverse the array from first position
+        for (int i = 1; i <= a.size(); i++) {
+
+            // Check the difference between the
+            // current and the previous elements
+            // If the difference doesn't equal to 1
+            // just increment the length variable.
+            if (i == a.size() || a.get(i) - a.get(i - 1) != 1) {
+
+                // If the range contains
+                // only one element.
+                // add it into the list.
+                if (length == 1) {
+                    List<Integer> range = new ArrayList<>();
+                    range.add(a.get(i - length));
+                    list.add(range);
+                } else {
+                    List<Integer> range = new ArrayList<>();
+                    // Build the range between the first
+                    // element of the range and the
+                    // current previous element as the
+                    // last range.
+                    range.add(a.get(i - length));
+                    range.add(a.get(i - 1));
+                    list.add(range);
+                }
+
+                // After finding the first range
+                // initialize the length by 1 to
+                // build the next range.
+                length = 1;
+            } else {
+                length++;
+            }
+        }
+
+        return list;
+    }
+
 //    public void toCSV() {
 //        File file = new File("output.csv");
 ////        try {

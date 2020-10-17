@@ -56,8 +56,8 @@ public class Annotator {
         ArrayList outputSentence = alignAndProject(parsedSL, parsedTL, Language.SINHALA);
 
 //            }
-        writeOutputJsonIntoFile(Language.ENGLISH);      // Write outputs into a file
-        writeOutputJsonIntoFile(Language.SINHALA);
+//        writeOutputJsonIntoFile(Language.ENGLISH);      // Write outputs into a file
+//        writeOutputJsonIntoFile(Language.SINHALA);
 //            siReader.close();
 ////            enReader.close();
 //        } catch (FileNotFoundException e){

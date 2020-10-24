@@ -223,11 +223,19 @@ public class BiSentence {
                                 frameLst.add(frame.getTokenRole(tl)); // Add tokenroles into list
                             }
                         } else {
-                            tokenJsonObj.put("text", tl.getText());
-                            tokenJsonObj.put("frame", frame.getTokenRole(tl));
-                            frameLst.add(frame.getTokenRole(tl)); // Add tokenroles into list
-                        }
+                            if (frame.getTokenRole(tl) != null) {
+                                tokenJsonObj.put("text", tl.getText());
+                                tokenJsonObj.put("frame", frame.getTokenRole(tl));
+                                frameLst.add(frame.getTokenRole(tl)); // Add tokenroles into list
+                            } else {
+                                tokenJsonObj.put("text", tl.getText());
+                                tokenJsonObj.put("frame", tl.getFrame().getLabel());
+                                if (!frameLst.contains(tl.getFrame().getLabel())) {          // Check whether frame label available to avoid repetition
+                                    frameLst.add(tl.getFrame().getLabel());
+                                }
 
+                            }
+                        }
 //                    } else if (tl.evokesFrame()) {
 //                        tokenJsonObj.put("text", tl.getText());
 ////                    tokenJsonObj.put("pos", tl.getPos());
@@ -235,13 +243,14 @@ public class BiSentence {
 //                        if (!frameLst.contains(tl.getFrame().getLabel())) {          // Check whether frame label available to avoid repetition
 //                            frameLst.add(tl.getFrame().getLabel());
 //                        }
-
-                    } else {
-                        tokenJsonObj.put("text", tl.getText());
-//                    tokenJsonObj.put("pos", tl.getPos());
-                        tokenJsonObj.put("frame", "_");
-                        frameLst.add("_");
                     }
+//                    } else {
+//                            tokenJsonObj.put("text", tl.getText());
+////                    tokenJsonObj.put("pos", tl.getPos());
+//                            tokenJsonObj.put("frame", "_");
+//                            frameLst.add("_");
+//
+//                    }
                 }
                 if (frameLst.size() != 0) {
                     tokenJsonObj.put("frame", frameLst.toString());         // Append Role list into jsonObject map

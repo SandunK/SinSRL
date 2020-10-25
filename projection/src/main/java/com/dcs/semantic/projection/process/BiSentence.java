@@ -257,7 +257,10 @@ public class BiSentence {
                 }
 
                 try {
-                    jsonLst.add((JSONObject) parser.parse(JSONValue.toJSONString(tokenJsonObj)));
+                    if (tokenJsonObj.size()!=0){
+                        jsonLst.add((JSONObject) parser.parse(JSONValue.toJSONString(tokenJsonObj)));
+                    }
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

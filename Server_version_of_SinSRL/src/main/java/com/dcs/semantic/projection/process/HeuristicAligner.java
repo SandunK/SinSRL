@@ -4,7 +4,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Controller;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,7 +17,6 @@ import java.util.Map;
  * needs to be precomputed (for instance) from aligned corpora. Pre-computed similarities are packaged for some
  * language pairs in src/main/resources/alignment.
  */
-@Controller
 public class HeuristicAligner {
 
     // Table for source/target token similarities
@@ -90,8 +88,12 @@ public class HeuristicAligner {
      * @return Similarity
      */
     public double getSimilarity(String source, String target) {
-        if (!this.similarities.contains(source, target)) return 0;
-        return this.similarities.get(source, target);
+        if (source.equals(target)){
+            return 0.99;
+        } else {
+            if (!this.similarities.contains(source, target)) return 0;
+            return this.similarities.get(source, target);
+        }
     }
 
 

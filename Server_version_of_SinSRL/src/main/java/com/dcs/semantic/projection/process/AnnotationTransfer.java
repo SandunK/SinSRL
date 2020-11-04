@@ -3,7 +3,6 @@ package com.dcs.semantic.projection.process;
 import com.google.common.base.Joiner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
@@ -13,7 +12,6 @@ import java.util.List;
  * Main class that executes annotation transfer for a BiSentence. Distinguishes between transfer of shallow syntax,
  * deep syntax and shallow semantics.
  */
-@Controller
 public class AnnotationTransfer {
 
     private static final Logger logger = LogManager.getLogger(AnnotationTransfer.class);
@@ -99,7 +97,9 @@ public class AnnotationTransfer {
 
             // Check if we can align token AND token evokes a frame
             Token aligned = biSentence.getAligned(tokenSL);
+
             if (aligned != null) {
+                System.out.println(tokenSL.getText()+" --> "+aligned.getText());
                 if (tokenSL.evokesFrame()) {
 
                     // If so, add this frame to the target token
@@ -112,6 +112,8 @@ public class AnnotationTransfer {
                         }
                     }
                 }
+            } else {
+                System.out.println(tokenSL.getText()+" --> null");
             }
         }
     }

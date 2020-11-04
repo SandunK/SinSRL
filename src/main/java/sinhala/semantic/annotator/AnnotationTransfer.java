@@ -98,7 +98,9 @@ public class AnnotationTransfer {
 
             // Check if we can align token AND token evokes a frame
             Token aligned = biSentence.getAligned(tokenSL);
+
             if (aligned != null) {
+                System.out.println(tokenSL.getText()+" --> "+aligned.getText());
                 if (tokenSL.evokesFrame()) {
 
                     // If so, add this frame to the target token
@@ -111,6 +113,8 @@ public class AnnotationTransfer {
                         }
                     }
                 }
+            } else {
+                System.out.println(tokenSL.getText()+" --> null");
             }
         }
     }

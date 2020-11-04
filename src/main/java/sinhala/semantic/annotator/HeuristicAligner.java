@@ -89,8 +89,12 @@ public class HeuristicAligner {
      * @return Similarity
      */
     public double getSimilarity(String source, String target) {
-        if (!this.similarities.contains(source, target)) return 0;
-        return this.similarities.get(source, target);
+        if (source.equals(target)){
+            return 0.99;
+        } else {
+            if (!this.similarities.contains(source, target)) return 0;
+            return this.similarities.get(source, target);
+        }
     }
 
 

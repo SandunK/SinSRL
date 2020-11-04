@@ -170,8 +170,10 @@ class PipelineWrapper {
                             if (verb.equals(p.get(0))) {
                                 for (Token token : parse.getTokens()) {
                                     ArrayList tags = (ArrayList) verbJson.get("tags");
-                                    String tag = (String) tags.get(words.indexOf(token.getText()));
-                                    frame.addRole(new Role(tag, token, ""));
+                                    if (words.contains(token.getText())) {
+                                        String tag = (String) tags.get(words.indexOf(token.getText()));
+                                        frame.addRole(new Role(tag, token, ""));
+                                    }
                                 }
                             }
                         }

@@ -46,8 +46,8 @@ testem.log
 Thumbs.db
 
 /target
-/.json
-/.en
-/.si
-/.tok
-/.txt
+.json
+.en
+.si
+.tok
+.txt

@@ -46,8 +46,8 @@ testem.log
 Thumbs.db
 
 /target
-.json
-.en
-.si
-.tok
-.txt
+outputENGLISH.json
+outputSINHALA.json
+test.en
+test.si
+test.si.tok

@@ -204,53 +204,6 @@ public class BiSentence {
     }
 
     /**
-     * Method to get similarity if any for given target token with source tokens
-     * @param type T2T - Text to Text similarity {T - Text, L - Lemma} (Similarly L2T,T2L,L2L)
-     * @param aligner Hueristic aligner
-     * @return similarity value 0 if not any
-     */
-    private ArrayList<ArrayList<Object>> getSimilarityWithType(String type, HeuristicAligner aligner){
-        ArrayList<ArrayList<Object>> result = new ArrayList<>();
-
-        double similarity = 0;
-        // skip tokens with los alignment expectation
-        for (Token targetToken : sentenceTL.getTokens()) {
-            ArrayList<Object> tokenSimilarity = new ArrayList<>();
-            // skip tokens with los alignment expectation
-            if (targetToken.hasLowAlignmentExpectation()) continue;
-
-            for (Token sourceToken : sentenceSL.getTokens()) {
-
-                if (sourceToken.hasLowAlignmentExpectation()) continue;
-
-                switch (type) {
-                    case "T2T":
-                        similarity = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getText().toLowerCase());
-                        break;
-                    case "L2T":
-                        similarity = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getText().toLowerCase());
-                        break;
-                    case "T2L":
-                        similarity = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getLemma().toLowerCase());
-                        break;
-                    case "L2L":
-                        similarity = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getLemma().toLowerCase());
-                        break;
-                }
-
-                if (similarity != 0) {
-                    tokenSimilarity.set(0,sourceToken);
-                    tokenSimilarity.set(1,targetToken);
-                    tokenSimilarity.set(2,similarity);
-                    break;
-                }
-            }
-            result.add(tokenSimilarity);
-        }
-        return result;
-    }
-
-    /**
      * Return aligned token if one exists, else returns null
      *
      * @param token Token to which alignment is sough

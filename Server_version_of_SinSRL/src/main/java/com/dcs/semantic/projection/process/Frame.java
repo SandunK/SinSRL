@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Class to hold a semantic frame. Each frame has a label and a set of Roles.
  * <p>
- * Created by Alan Akbik on 8/29/17.
+ * Created by DCS Group on 8/29/17.
  */
 @Component
 public class Frame {

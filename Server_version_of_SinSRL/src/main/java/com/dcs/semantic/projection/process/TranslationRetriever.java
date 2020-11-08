@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Created by Alan Akbik on 8/31/17.
+ * Created by DCS Group on 8/31/17.
  * <p>
  * Simple class that holds a map of precomputed sentence translations. Use it to retrieve translations
  */

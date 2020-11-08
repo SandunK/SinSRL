@@ -4,7 +4,7 @@ package sinhala.semantic.annotator;
  * Simple class that holds a contraction. For instance, the German preposition "im" will be tokenized as "in dem".
  * This class is used to store the original form of the contraction and which tokens it pertains to.
  *
- * Created by Alan Akbik on 8/28/17.
+ * Created by DCS Group on 8/28/17.
  */
 class Contraction {
 

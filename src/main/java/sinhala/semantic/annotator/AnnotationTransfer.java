@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 /**
- * Created by Alan Akbik (alan.akbik@zalando.de) on 8/28/17.
+ * Created by DCS Group (alan.akbik@zalando.de) on 8/28/17.
  * <p>
  * Main class that executes annotation transfer for a BiSentence. Distinguishes between transfer of shallow syntax,
  * deep syntax and shallow semantics.

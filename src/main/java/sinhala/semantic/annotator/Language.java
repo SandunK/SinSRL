@@ -4,7 +4,7 @@ package sinhala.semantic.annotator;
  *
  * Simple enum for supported languages.
  *
- * Created by Alan Akbik on 8/30/17.
+ * Created by DCS Group on 8/30/17.
  */
 public enum Language {
 

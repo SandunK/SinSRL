@@ -13,7 +13,7 @@ import java.util.Map;
  * Basic object that holds one sentence with different levels of NLP information. Consists of a list of tokens (words)
  * in the sentence, a list of metadata lines, as well as a list of contractions.
  * <p>
- * Created by Alan Akbik on 8/28/17.
+ * Created by DCS Group on 8/28/17.
  */
 @Controller
 public class Sentence {

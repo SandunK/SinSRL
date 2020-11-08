@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Collection of String helper methods.
  * <p>
- * Created by Alan Akbik on 8/28/17.
+ * Created by DCS Group on 8/28/17.
  */
 public class StringHelper {
 

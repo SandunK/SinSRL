@@ -12,7 +12,7 @@ import org.json.simple.parser.ParseException;
 import java.util.*;
 
 /**
- * Created by Alan Akbik on 8/28/17.
+ * Created by DCS Group on 8/28/17.
  * <p>
  * Class that holds a bisentence, i.e. two sentences that are translations of each other. One of the sentences is the
  * source sentence, while the other is the target (for the purpose of annotation projection).
@@ -49,43 +49,143 @@ public class BiSentence {
 
         // this map records all possible alignments
         Map<Alignment, Double> pairDistance = Maps.newHashMap();
-
+        List<Token> tlTokens = new ArrayList<>(this.sentenceTL.getTokens());
         // Go through all source and target language tokens
-        for (Token targetToken : sentenceTL.getTokens()) {
+
+        // first check source text to target text alignments
+        Iterator<Token> i = tlTokens.iterator();
+
+        while (i.hasNext()) {
+            Token targetToken = i.next(); // must be called before you can call i.remove()
 
             // skip tokens with los alignment expectation
             if (targetToken.hasLowAlignmentExpectation()) continue;
-
             for (Token sourceToken : sentenceSL.getTokens()) {
 
                 if (sourceToken.hasLowAlignmentExpectation()) continue;
 
-                // get token similarity, try combinations of lemmas and text
                 double similarity = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getText().toLowerCase());
-                double other = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getText().toLowerCase());
-                if (other > similarity) similarity = other;
-                other = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getLemma().toLowerCase());
-                if (other > similarity) similarity = other;
-                other = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getLemma().toLowerCase());
-                if (other > similarity) similarity = other;
-                if (targetToken.getText().equals(sourceToken.getText())) {
-                    other = 0.5;
-                    if (other > similarity) similarity = other;
-                }
-//                System.out.println(targetToken.getText() + sourceToken.getText() + similarity);
-                // if similarity exists, add alignment
-                if (similarity > 0.8) {
-
-                    int tokenDistance = sourceToken.getId() - targetToken.getId();
-                    if (targetToken.getId() > sourceToken.getId())
-                        tokenDistance = targetToken.getId() - sourceToken.getId();
-
-                    similarity -= (double) tokenDistance / 100;
+                if (similarity != 0) {
+//                    int tokenDistance = sourceToken.getId() - targetToken.getId();
+//                    if (targetToken.getId() > sourceToken.getId())
+//                        tokenDistance = targetToken.getId() - sourceToken.getId();
+//
+//                    similarity -= (double) tokenDistance / 100;
                     pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
+                    i.remove();
+                    break;
                 }
             }
         }
 
+        // If not above then check source lemma to target text alignments
+        i = tlTokens.iterator();
+        while (i.hasNext()) {
+            Token targetToken = i.next(); // must be called before you can call i.remove()
+
+            // skip tokens with los alignment expectation
+            if (targetToken.hasLowAlignmentExpectation()) continue;
+            for (Token sourceToken : sentenceSL.getTokens()) {
+
+                if (sourceToken.hasLowAlignmentExpectation()) continue;
+
+                double similarity = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getText().toLowerCase());
+                if (similarity != 0) {
+//                    int tokenDistance = sourceToken.getId() - targetToken.getId();
+//                    if (targetToken.getId() > sourceToken.getId())
+//                        tokenDistance = targetToken.getId() - sourceToken.getId();
+//
+//                    similarity -= (double) tokenDistance / 100;
+                    pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
+                    i.remove();
+                }
+            }
+        }
+
+        // If not above all then check source text to target lemma alignments
+        i = tlTokens.iterator();
+        while (i.hasNext()) {
+            Token targetToken = i.next(); // must be called before you can call i.remove()
+
+            // skip tokens with los alignment expectation
+            if (targetToken.hasLowAlignmentExpectation()) continue;
+            for (Token sourceToken : sentenceSL.getTokens()) {
+
+                if (sourceToken.hasLowAlignmentExpectation()) continue;
+
+                double similarity = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getLemma().toLowerCase());
+                if (similarity != 0) {
+//                    int tokenDistance = sourceToken.getId() - targetToken.getId();
+//                    if (targetToken.getId() > sourceToken.getId())
+//                        tokenDistance = targetToken.getId() - sourceToken.getId();
+//
+//                    similarity -= (double) tokenDistance / 100;
+                    pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
+                    i.remove();
+                }
+            }
+        }
+
+        // If not above all then check source lemma to target lemma alignments
+        i = tlTokens.iterator();
+        while (i.hasNext()) {
+            Token targetToken = i.next(); // must be called before you can call i.remove()
+
+            // skip tokens with los alignment expectation
+            if (targetToken.hasLowAlignmentExpectation()) continue;
+            for (Token sourceToken : sentenceSL.getTokens()) {
+
+                if (sourceToken.hasLowAlignmentExpectation()) continue;
+
+                double similarity = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getLemma().toLowerCase());
+                if (similarity != 0) {
+//                    int tokenDistance = sourceToken.getId() - targetToken.getId();
+//                    if (targetToken.getId() > sourceToken.getId())
+//                        tokenDistance = targetToken.getId() - sourceToken.getId();
+//
+//                    similarity -= (double) tokenDistance / 100;
+                    pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
+                    i.remove();
+                }
+            }
+        }
+
+
+//        for (Token targetToken : sentenceTL.getTokens()) {
+//
+//            // skip tokens with los alignment expectation
+//            if (targetToken.hasLowAlignmentExpectation()) continue;
+//
+//
+//            for (Token sourceToken : sentenceSL.getTokens()) {
+//
+//                if (sourceToken.hasLowAlignmentExpectation()) continue;
+//
+//                // get token similarity, try combinations of lemmas and text
+//                double similarity = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getText().toLowerCase());
+//                double other = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getText().toLowerCase());
+//                if (other > similarity) similarity = other;
+//                other = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getLemma().toLowerCase());
+//                if (other > similarity) similarity = other;
+//                other = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getLemma().toLowerCase());
+//                if (other > similarity) similarity = other;
+//                if (targetToken.getText().equals(sourceToken.getText())) {
+//                    other = 0.5;
+//                    if (other > similarity) similarity = other;
+//                }
+////                System.out.println(targetToken.getText() + sourceToken.getText() + similarity);
+//                // if similarity exists, add alignment
+//                if (similarity > 0.8) {
+//
+//                    int tokenDistance = sourceToken.getId() - targetToken.getId();
+//                    if (targetToken.getId() > sourceToken.getId())
+//                        tokenDistance = targetToken.getId() - sourceToken.getId();
+//
+//                    similarity -= (double) tokenDistance / 100;
+//                    pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
+//                }
+//            }
+//        }
         Set<Token> mappedSource = Sets.newHashSet();
         Set<Token> mappedTarget = Sets.newHashSet();
 
@@ -103,6 +203,52 @@ public class BiSentence {
         return this;
     }
 
+    /**
+     * Method to get similarity if any for given target token with source tokens
+     * @param type T2T - Text to Text similarity {T - Text, L - Lemma} (Similarly L2T,T2L,L2L)
+     * @param aligner Hueristic aligner
+     * @return similarity value 0 if not any
+     */
+    private ArrayList<ArrayList<Object>> getSimilarityWithType(String type, HeuristicAligner aligner){
+        ArrayList<ArrayList<Object>> result = new ArrayList<>();
+
+        double similarity = 0;
+        // skip tokens with los alignment expectation
+        for (Token targetToken : sentenceTL.getTokens()) {
+            ArrayList<Object> tokenSimilarity = new ArrayList<>();
+            // skip tokens with los alignment expectation
+            if (targetToken.hasLowAlignmentExpectation()) continue;
+
+            for (Token sourceToken : sentenceSL.getTokens()) {
+
+                if (sourceToken.hasLowAlignmentExpectation()) continue;
+
+                switch (type) {
+                    case "T2T":
+                        similarity = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getText().toLowerCase());
+                        break;
+                    case "L2T":
+                        similarity = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getText().toLowerCase());
+                        break;
+                    case "T2L":
+                        similarity = aligner.getSimilarity(sourceToken.getText().toLowerCase(), targetToken.getLemma().toLowerCase());
+                        break;
+                    case "L2L":
+                        similarity = aligner.getSimilarity(sourceToken.getLemma().toLowerCase(), targetToken.getLemma().toLowerCase());
+                        break;
+                }
+
+                if (similarity != 0) {
+                    tokenSimilarity.set(0,sourceToken);
+                    tokenSimilarity.set(1,targetToken);
+                    tokenSimilarity.set(2,similarity);
+                    break;
+                }
+            }
+            result.add(tokenSimilarity);
+        }
+        return result;
+    }
 
     /**
      * Return aligned token if one exists, else returns null

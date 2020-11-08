@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by Alan Akbik on 4/26/17.
+ * Created by DCS Group on 4/10/20.
  *
  * Class that is used to word-align a BiSentence on the fly. Contains a table of source/target token similarities that
  * needs to be precomputed (for instance) from aligned corpora. Pre-computed similarities are packaged for some
@@ -46,16 +46,16 @@ public class HeuristicAligner {
         LineReader dicEn = LineReader.readFromClasspathFile("alignment/" + language.toString().toLowerCase() + "-terms.en");
 
         // Read dictionary into memory.
-        while (true) {
-            String line = lineReader.getNextLine();
-            if (line == null) break;
-
-            String[] fields = line.trim().split("\\t");
-            if (fields.length == 3) {
-                Double prob = Double.parseDouble(fields[2]);
-                dictionary.similarities.put(fields[0], fields[1], prob);
-            }
-        }
+//        while (true) {
+//            String line = lineReader.getNextLine();
+//            if (line == null) break;
+//
+//            String[] fields = line.trim().split("\\t");
+//            if (fields.length == 3) {
+//                Double prob = Double.parseDouble(fields[2]);
+//                dictionary.similarities.put(fields[0], fields[1], prob);
+//            }
+//        }
 
         // Read aug dictionary into memory.
         DictionaryReader(dictionary, augdicSi, augdicEn);

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 
 /**
- * Created by Alan Akbik on 4/21/17.
+ * Created by DCS Group on 4/21/17.
  *
  * Object used for communication with javascript. Contains source and target sentence, alignments and all levels of
  * supported linguistic annotation.

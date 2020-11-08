@@ -9,7 +9,7 @@ import java.util.List;
  * Main class for holding a token (word) with different levels of NLP information. Each Token is assigned a Sentence.
  * Achtung: Constructor is protected, i.e. make new Token object using static creator in Sentence object.
  * <p>
- * Created by Alan Akbik on 8/28/17.
+ * Created by DCS Group on 8/28/17.
  */
 public class Token implements Comparable<Token> {
 

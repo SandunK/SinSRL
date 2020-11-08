@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import java.util.Map;
 
 /**
- * Created by Alan Akbik on 9/1/17.
+ * Created by DCS Group on 9/1/17.
  *
  * This object holds all object required for executing annotation projection through the WebUI. The static instance
  * is so that each object is initialized only once.

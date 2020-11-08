@@ -6,7 +6,7 @@ import java.util.Iterator;
 /**
  * Simple helper class for reading a text file line by line.
  * <p>
- * Created by Alan Akbik on 3/3/17.
+ * Created by DCS Group on 3/3/17.
  */
 public class LineReader implements Iterable<String> {
 

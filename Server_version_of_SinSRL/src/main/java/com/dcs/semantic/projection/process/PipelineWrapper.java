@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  * semantic role labeling for various languages. The Language needs to be passed to the constructor, then the pipeline
  * is automatically set up.
  * <p>
- * Created by Alan Akbik on 8/28/17.
+ * Created by DCS Group on 8/28/17.
  */
 class PipelineWrapper {
 

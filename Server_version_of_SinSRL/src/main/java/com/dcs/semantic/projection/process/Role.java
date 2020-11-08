@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
  *
  * Class for a Role of a Frame. Each role is represented by a Token (its syntactic head), and its role label.
  *
- * Created by Alan Akbik on 8/29/17.
+ * Created by DCS Group on 8/29/17.
  */
 public class Role {
 

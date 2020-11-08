@@ -9,7 +9,7 @@ import java.util.List;
  * Class for holding a syntactic constituent, which is a list of tokens. Constituents can determine their syntactic heads
  * and their Jaccard similarity to other constituents.
  * <p>
- * Created by Alan Akbik on 8/30/17.
+ * Created by DCS Group on 8/30/17.
  */
 public class Constituent {
 

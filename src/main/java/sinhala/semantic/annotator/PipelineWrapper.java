@@ -205,35 +205,40 @@ class PipelineWrapper {
             }
             for (String word : tokenList) {
                 String pos = posTagMap.get(word);
-                if (pos.contains("V") && word.startsWith("නො")){
-                    JSONObject splitterResult = this.getBaseWord(word);
+                if (pos != null) {
+                    if (pos.contains("V") && word.startsWith("නො")){
+                        JSONObject splitterResult = this.getBaseWord(word);
 
-                    if (splitterResult == null){
-                        Token newtoken = parse.newToken().setText(word).setPos(pos);
-                        newtoken.setLemma("-");
-                    } else {
-                        List debugList = (List) splitterResult.get("debug");
-                        for (Object instance:debugList){
-                            List listInstance = (List) instance;
-                            String prefix = (String) listInstance.get(0);
-                            String base = (String) listInstance.get(1);
-                            if (prefix.equals("නො")){
-                                Token newtoken = parse.newToken().setText(prefix).setPos("DT");
-                                Token newtoken2 = parse.newToken().setText(base).setPos(pos);
+                        if (splitterResult == null){
+                            Token newtoken = parse.newToken().setText(word).setPos(pos);
+                            newtoken.setLemma("-");
+                        } else {
+                            List debugList = (List) splitterResult.get("debug");
+                            for (Object instance:debugList){
+                                List listInstance = (List) instance;
+                                String prefix = (String) listInstance.get(0);
+                                String base = (String) listInstance.get(1);
+                                if (prefix.equals("නො")){
+                                    Token newtoken = parse.newToken().setText(prefix).setPos("DT");
+                                    Token newtoken2 = parse.newToken().setText(base).setPos(pos);
+                                }
                             }
                         }
-                    }
 
-                } else {
-                    Token newtoken = parse.newToken().setText(word).setPos(pos);
-                    JSONObject splitterResult = this.getBaseWord(word); // get base word eg:දරුවාට base:දරුවා
-                    if (splitterResult == null){
-                        newtoken.setLemma("-");
                     } else {
-                        newtoken.setLemma((String) splitterResult.get("base"));
-                    }
+                        Token newtoken = parse.newToken().setText(word).setPos(pos);
+                        JSONObject splitterResult = this.getBaseWord(word); // get base word eg:දරුවාට base:දරුවා
+                        if (splitterResult == null){
+                            newtoken.setLemma("-");
+                        } else {
+                            newtoken.setLemma((String) splitterResult.get("base"));
+                        }
 
+                    }
+                } else {
+                    Token newtoken = parse.newToken().setText(word);
                 }
+
                 // Determine universal dependencies from tagset
                 toUniversalDependencies(parse);
 

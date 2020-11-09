@@ -413,7 +413,19 @@ public class Sentence {
         return tokens;
     }
 
-
+    /**
+     * Method to return the token that has given text
+     * @param text Given text
+     * @return token object
+     */
+    public Token getTokenHasText(String text){
+        for (Token token : tokens) {
+            if (token.getText().equals(text)){
+                return token;
+            }
+        }
+        return null;
+    }
     // ------------------------------------------------------------------------
     // Helper methods to get lists of strings of Token fields
     // ------------------------------------------------------------------------

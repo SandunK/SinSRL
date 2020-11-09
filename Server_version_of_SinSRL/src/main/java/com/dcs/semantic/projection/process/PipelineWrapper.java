@@ -153,22 +153,26 @@ class PipelineWrapper {
 
                     assert predicates != null;
                     for (ArrayList<String> p : predicates) {
-                        Frame frame = parse.getToken(words.indexOf(p.get(0))+1).addNewFrame(p.get(1));
+                        try {
+                            Frame frame = parse.getTokenHasText(p.get(0)).addNewFrame(p.get(1));
+                            for (Object verbObject : verbs) {
+                                JSONObject verbJson = (JSONObject) verbObject;
+                                String verb = (String) verbJson.get("verb");
 
-                        for (Object verbObject : verbs) {
-                            JSONObject verbJson = (JSONObject) verbObject;
-                            String verb = (String) verbJson.get("verb");
-
-                            if (verb.equals(p.get(0))) {
-                                for (Token token : parse.getTokens()) {
-                                    ArrayList tags = (ArrayList) verbJson.get("tags");
-                                    if (words.contains(token.getText())) {
-                                        String tag = (String) tags.get(words.indexOf(token.getText()));
-                                        frame.addRole(new Role(tag, token, ""));
+                                if (verb.equals(p.get(0))) {
+                                    for (Token token : parse.getTokens()) {
+                                        ArrayList tags = (ArrayList) verbJson.get("tags");
+                                        if (words.contains(token.getText())) {
+                                            String tag = (String) tags.get(words.indexOf(token.getText()));
+                                            frame.addRole(new Role(tag, token, ""));
+                                        }
                                     }
                                 }
                             }
+                        } catch (NullPointerException e){
+                            logger.error(e);
                         }
+
                     }
                 }
                 return parse;
@@ -192,8 +196,11 @@ class PipelineWrapper {
             }
 
             if (!isVerbIdentified) {
-                tokenList.add("*");
-                posTagMap.put("*","VERB");
+                if (!tokenList.contains("ය") && !tokenList.contains("යි") ){
+                    tokenList.add("*");
+                    posTagMap.put("*","VERB");
+                }
+
             }
             for (String word : tokenList) {
                 String pos = posTagMap.get(word);
@@ -273,7 +280,7 @@ class PipelineWrapper {
             while (m.find()) {
                 ArrayList<String> predicateWithForms = new ArrayList<>();
                 String predicate=m.group();
-                System.out.println(predicate);
+                logger.info(predicate);
                 String verb = words.get(words.indexOf(predicate)-1); // get actual word of the predicate
                 predicateWithForms.add(verb);
                 predicateWithForms.add(predicate.substring(1,predicate.length()-1)); // <predicate.01> --> predicate.01
@@ -300,7 +307,7 @@ class PipelineWrapper {
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
         wordList.removeIf(t -> t.equals("")); // remove spaces in the middle of a sentence
         Map<String, String> posTagMap = this.getSinhalaPosTag(sentence);        // Postags for each word in sentence
-        List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP","NCV","JCV", "RPCV","RRPCV", "SVCV","VBZ");     // NCV Tag set to identify compound verbs
+        List<String> verbTags = Arrays.asList("VNN", "VFM", "VBP", "VNF", "VP","NCV","JCV", "PCV","RPCV","RRPCV", "SVCV","VBZ");     // NCV Tag set to identify compound verbs
         ArrayList<String> compVerbWords = new ArrayList<>();        // Words that have above verb tags as pos
         ArrayList<String> compVerbs = new ArrayList<>();        // Identified compound verbs
         ArrayList<String> compVerbObject = new ArrayList<>();       // List to store words of each compound verb
@@ -383,7 +390,7 @@ class PipelineWrapper {
         Map<String, ArrayList> resultMap = new HashMap<>();
         obj.put("sentence", sentence);
         String jsonText = JSONValue.toJSONString(obj);
-        System.out.println("Requesting English SRL from AllenNLP");
+        logger.info("Requesting English SRL from AllenNLP");
         try {
             JSONObject result = this.makeHttpPost(url, jsonText);
             return result;
@@ -447,7 +454,7 @@ class PipelineWrapper {
             Map<String, String> obj = new HashMap<>();
             obj.put("word", word);
             String jsonText = JSONValue.toJSONString(obj);
-            System.out.println(jsonText);
+            logger.info(jsonText);
             return this.makeHttpPost(postUrl, jsonText);
 //            if (result != null) {
 //                System.out.println((String) result.get("base"));
@@ -481,8 +488,8 @@ class PipelineWrapper {
 
         if (result != null) {
             for (String word : wordList) {
-                System.out.println(word);
-                System.out.println((String) result.get(word));         // Put outputs into a map
+                logger.info(word);
+                logger.info((String) result.get(word));         // Put outputs into a map
                 postagMap.put(word, (String) result.get(word));
             }
             return postagMap;
@@ -502,9 +509,9 @@ class PipelineWrapper {
         Properties props = new Properties();
         try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
             props.load(resourceStream);
-            System.out.println("Successfully loaded 'config.properties' file...");
+            logger.info("Successfully loaded 'config.properties' file...");
         } catch (IOException e) {
-            System.out.println("Error loading 'config.properties' file...");
+            logger.error("Error loading 'config.properties' file...");
         }
         return props;
     }

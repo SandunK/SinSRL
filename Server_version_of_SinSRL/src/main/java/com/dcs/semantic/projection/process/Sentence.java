@@ -3,7 +3,6 @@ package com.dcs.semantic.projection.process;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.springframework.stereotype.Controller;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Map;
  * <p>
  * Created by DCS Group on 8/28/17.
  */
-@Controller
 public class Sentence {
 
     // List of all tokens (words) in this sentence.
@@ -414,7 +412,19 @@ public class Sentence {
         return tokens;
     }
 
-
+    /**
+     * Method to return the token that has given text
+     * @param text Given text
+     * @return token object
+     */
+    public Token getTokenHasText(String text){
+        for (Token token : tokens) {
+            if (token.getText().equals(text)){
+                return token;
+            }
+        }
+        return null;
+    }
     // ------------------------------------------------------------------------
     // Helper methods to get lists of strings of Token fields
     // ------------------------------------------------------------------------

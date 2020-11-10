@@ -50,17 +50,22 @@ public class BiSentence {
         // this map records all possible alignments
         Map<Alignment, Double> pairDistance = Maps.newHashMap();
         List<Token> tlTokens = new ArrayList<>(this.sentenceTL.getTokens());
+        List<Token> slTokens = new ArrayList<>(this.sentenceSL.getTokens());
         // Go through all source and target language tokens
 
         // first check source text to target text alignments
-        Iterator<Token> i = tlTokens.iterator();
+        Iterator<Token> tlIterator = tlTokens.iterator();
 
-        while (i.hasNext()) {
-            Token targetToken = i.next(); // must be called before you can call i.remove()
+        while (tlIterator.hasNext()) {
+            Token targetToken = tlIterator.next(); // must be called before you can call tlIterator.remove()
 
             // skip tokens with los alignment expectation
             if (targetToken.hasLowAlignmentExpectation()) continue;
-            for (Token sourceToken : sentenceSL.getTokens()) {
+
+            Iterator<Token> slIterator = slTokens.iterator();
+            while (slIterator.hasNext()) {
+                Token sourceToken = slIterator.next();
+//            for (Token sourceToken : sentenceSL.getTokens()) {
 
                 if (sourceToken.hasLowAlignmentExpectation()) continue;
 
@@ -72,20 +77,25 @@ public class BiSentence {
 //
 //                    similarity -= (double) tokenDistance / 100;
                     pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
-                    i.remove();
+                    tlIterator.remove();
+                    slIterator.remove();
                     break;
                 }
             }
         }
 
         // If not above then check source lemma to target text alignments
-        i = tlTokens.iterator();
-        while (i.hasNext()) {
-            Token targetToken = i.next(); // must be called before you can call i.remove()
+        tlIterator = tlTokens.iterator();
+        while (tlIterator.hasNext()) {
+            Token targetToken = tlIterator.next(); // must be called before you can call tlIterator.remove()
 
             // skip tokens with los alignment expectation
             if (targetToken.hasLowAlignmentExpectation()) continue;
-            for (Token sourceToken : sentenceSL.getTokens()) {
+
+            Iterator<Token> slIterator = slTokens.iterator();
+            while (slIterator.hasNext()) {
+                Token sourceToken = slIterator.next();
+//            for (Token sourceToken : sentenceSL.getTokens()) {
 
                 if (sourceToken.hasLowAlignmentExpectation()) continue;
 
@@ -97,19 +107,25 @@ public class BiSentence {
 //
 //                    similarity -= (double) tokenDistance / 100;
                     pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
-                    i.remove();
+                    tlIterator.remove();
+                    slIterator.remove();
+                    break;
                 }
             }
         }
 
         // If not above all then check source text to target lemma alignments
-        i = tlTokens.iterator();
-        while (i.hasNext()) {
-            Token targetToken = i.next(); // must be called before you can call i.remove()
+        tlIterator = tlTokens.iterator();
+        while (tlIterator.hasNext()) {
+            Token targetToken = tlIterator.next(); // must be called before you can call tlIterator.remove()
 
             // skip tokens with los alignment expectation
             if (targetToken.hasLowAlignmentExpectation()) continue;
-            for (Token sourceToken : sentenceSL.getTokens()) {
+
+            Iterator<Token> slIterator = slTokens.iterator();
+            while (slIterator.hasNext()) {
+                Token sourceToken = slIterator.next();
+//            for (Token sourceToken : sentenceSL.getTokens()) {
 
                 if (sourceToken.hasLowAlignmentExpectation()) continue;
 
@@ -121,19 +137,25 @@ public class BiSentence {
 //
 //                    similarity -= (double) tokenDistance / 100;
                     pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
-                    i.remove();
+                    tlIterator.remove();
+                    slIterator.remove();
+                    break;
                 }
             }
         }
 
         // If not above all then check source lemma to target lemma alignments
-        i = tlTokens.iterator();
-        while (i.hasNext()) {
-            Token targetToken = i.next(); // must be called before you can call i.remove()
+        tlIterator = tlTokens.iterator();
+        while (tlIterator.hasNext()) {
+            Token targetToken = tlIterator.next(); // must be called before you can call tlIterator.remove()
 
             // skip tokens with los alignment expectation
             if (targetToken.hasLowAlignmentExpectation()) continue;
-            for (Token sourceToken : sentenceSL.getTokens()) {
+
+            Iterator<Token> slIterator = slTokens.iterator();
+            while (slIterator.hasNext()) {
+                Token sourceToken = slIterator.next();
+//            for (Token sourceToken : sentenceSL.getTokens()) {
 
                 if (sourceToken.hasLowAlignmentExpectation()) continue;
 
@@ -145,7 +167,9 @@ public class BiSentence {
 //
 //                    similarity -= (double) tokenDistance / 100;
                     pairDistance.put(new Alignment(sourceToken, targetToken), similarity);
-                    i.remove();
+                    tlIterator.remove();
+                    slIterator.remove();
+                    break;
                 }
             }
         }
@@ -195,8 +219,8 @@ public class BiSentence {
             // add alignment if source and target token are not yet aligned
             if (entry.getValue() > 0 && !mappedSource.contains(entry.getKey().sl) && !mappedTarget.contains(entry.getKey().tl)) {
                 this.aligments.put(entry.getKey().sl, entry.getKey().tl, 1.);
-                mappedSource.add(entry.getKey().sl);
-                mappedTarget.add(entry.getKey().tl);
+//                mappedSource.add(entry.getKey().sl);  // removed since if there are two sinhala words map into two same english word
+//                mappedTarget.add(entry.getKey().tl);  // one mapping was neglect. Now all alignments are available. Consider this if any error occurred
             }
         }
 

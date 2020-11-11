@@ -60,7 +60,7 @@ class PipelineWrapper {
     // MATE semantic role labeler for SRL in English
     private SemanticRoleLabeler semanticRoleLabeler;
 
-    private Logger logger = LogManager.getLogger(LanguageDAO.class);
+    private Logger logger = LogManager.getLogger(PipelineWrapper.class);
 
     /**
      * Constructor for pipeline object. Require language to be specified.

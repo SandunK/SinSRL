@@ -197,10 +197,13 @@ class PipelineWrapper {
 
             for(Object pos: posTagMap.values()){
                 String posStr = (String) pos;           // check whether sentence have a verb. (We assuemes sentence without verb in sinhala as sentences with be worbs in english)
-                if (posStr.contains("V")){
-                    isVerbIdentified = true;
-                    break;
+                if (posStr!=null){
+                    if (posStr.contains("V")){
+                        isVerbIdentified = true;
+                        break;
+                    }
                 }
+
             }
 
             if (!isVerbIdentified) {

@@ -52,7 +52,7 @@ class PipelineWrapper {
     // MATE semantic role labeler for SRL in English
     private SemanticRoleLabeler semanticRoleLabeler;
 
-    private Logger logger = LogManager.getLogger(LanguageDAO.class);
+    private Logger logger = LogManager.getLogger(PipelineWrapper.class);
 
     /**
      * Constructor for pipeline object. Require language to be specified.
@@ -189,10 +189,13 @@ class PipelineWrapper {
 
             for(Object pos: posTagMap.values()){
                 String posStr = (String) pos;           // check whether sentence have a verb. (We assuemes sentence without verb in sinhala as sentences with be worbs in english)
-                if (posStr.contains("V")){
-                    isVerbIdentified = true;
-                    break;
+                if (posStr!=null){
+                    if (posStr.contains("V")){
+                        isVerbIdentified = true;
+                        break;
+                    }
                 }
+
             }
 
             if (!isVerbIdentified) {

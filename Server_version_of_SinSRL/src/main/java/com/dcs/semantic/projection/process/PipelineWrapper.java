@@ -20,7 +20,8 @@ import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
-import se.lth.cs.srl.SemanticRoleLabeler;
+import org.springframework.stereotype.Controller;
+//import se.lth.cs.srl.SemanticRoleLabeler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +42,7 @@ import java.util.regex.Pattern;
 class PipelineWrapper {
 
     // Language of this pipeline, defaults to English.
-    private Language language = Language.ENGLISH;
+    private Language language;
 
     // Anna lemmatizer for this pipeline (note: some languages such as Chinese do not have lemmatizers)
     private Lemmatizer lemmatizer;
@@ -50,15 +51,20 @@ class PipelineWrapper {
     private StanfordCoreNLP pipeline = null;
 
     // MATE semantic role labeler for SRL in English
-    private SemanticRoleLabeler semanticRoleLabeler;
+//    private SemanticRoleLabeler semanticRoleLabeler;
 
-    private Logger logger = LogManager.getLogger(PipelineWrapper.class);
+    private Logger logger = LogManager.getLogger(LanguageDAO.class);
+
+//    private String serverAddress;
+
+    private String serverAddress = "34.123.37.137";
 
     /**
      * Constructor for pipeline object. Require language to be specified.
      *
      * @param language Target language for this pipeline.
      */
+
     PipelineWrapper(Language language) {
 
         this.language = language;
@@ -264,8 +270,9 @@ class PipelineWrapper {
      */
     private ArrayList<ArrayList<String>> getPredicates (String sentence){
         ArrayList<ArrayList<String>> predicates = new ArrayList<>();
-        Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + "/getpredicates";// put in your url
+//        Properties props = this.loadPropFile();
+//        String postUrl = "http://" + props.getProperty("server.Address") + "/getpredicates";// put in your url
+        String postUrl = "http://" + serverAddress + "/getpredicates";// put in your url
         Map<String, String> obj = new HashMap<>();
         obj.put("word", sentence);
         String jsonText = JSONValue.toJSONString(obj);
@@ -451,8 +458,9 @@ class PipelineWrapper {
      */
     private JSONObject getBaseWord(String word) {
 
-        Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + "/split";// put in your url
+//        Properties props = this.loadPropFile();
+//        String postUrl = "http://" + props.getProperty("serverAddress") + ":3000/split";// put in your url
+        String postUrl = "http://" + serverAddress + "/split";// put in your url
         if (word.length() > 1) {
             Map<String, String> obj = new HashMap<>();
             obj.put("word", word);
@@ -479,8 +487,9 @@ class PipelineWrapper {
         String str[] = text.split(" ");     // Whitespace tokenizing
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
         wordList.removeIf(t -> t.equals("")); // remove spaces in the middle of a sentence
-        Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + "/getpos";// put in your url
+//        Properties props = this.loadPropFile();
+//        String postUrl = "http://" + props.getProperty("serverAddress") + ":3002/getpos";// put in your url
+        String postUrl = "http://" + serverAddress + "/getpos";// put in your url
         Map<String, String> postagMap = new HashMap<String, String>();
         String sentence = String.join(" ",wordList);
         Map<String, String> postJson = new HashMap<String, String>();
@@ -507,7 +516,7 @@ class PipelineWrapper {
      * @return Properties object
      */
     private Properties loadPropFile() {
-        String resourceName = "config.properties";      // property file to load server details
+        String resourceName = "config.conf";      // property file to load server details
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Properties props = new Properties();
         try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {

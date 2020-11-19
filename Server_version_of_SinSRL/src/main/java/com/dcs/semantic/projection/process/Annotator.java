@@ -51,8 +51,8 @@ public class Annotator {
 //                String targetSentence = siReader.nextLine();
 //                String sourceSentence = enReader.nextLine();
 
-        Sentence parsedSL = slPipeline.parse(removePunctuations(englishSentence).trim());
-        Sentence parsedTL = tlPipeline.parse(removePunctuations(sinhalaSentenceTok).trim());
+        Sentence parsedSL = slPipeline.parse(englishSentence.trim());
+        Sentence parsedTL = tlPipeline.parse(sinhalaSentenceTok.trim());
         ArrayList outputSentence = alignAndProject(parsedSL, parsedTL, Language.SINHALA);
 
 //            }

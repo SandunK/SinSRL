@@ -49,10 +49,11 @@ public class Annotator {
                 String targetSentence = siReader.nextLine();
                 String sourceSentence = enReader.nextLine();
 
-                Sentence parsedSL = slPipeline.parse(removePunctuations(sourceSentence).trim());
-                Sentence parsedTL = tlPipeline.parse(removePunctuations(targetSentence).trim());
+//                Sentence parsedSL = slPipeline.parse(removePunctuations(sourceSentence).trim());
+//                Sentence parsedTL = tlPipeline.parse(removePunctuations(targetSentence).trim());
+                Sentence parsedSL = slPipeline.parse(sourceSentence.trim());
+                Sentence parsedTL = tlPipeline.parse(targetSentence.trim());
                 alignAndProject(parsedSL, parsedTL, Language.SINHALA);
-
             }
             writeOutputJsonIntoFile(Language.ENGLISH);      // Write outputs into a file
             writeOutputJsonIntoFile(Language.SINHALA);

@@ -3,6 +3,7 @@ package com.dcs.semantic.projection.process;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.springframework.stereotype.Controller;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map;
  * <p>
  * Created by DCS Group on 8/28/17.
  */
+@Controller
 public class Sentence {
 
     // List of all tokens (words) in this sentence.

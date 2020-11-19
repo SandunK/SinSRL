@@ -54,7 +54,6 @@ public class Annotator {
                 Sentence parsedSL = slPipeline.parse(sourceSentence.trim());
                 Sentence parsedTL = tlPipeline.parse(targetSentence.trim());
                 alignAndProject(parsedSL, parsedTL, Language.SINHALA);
-
             }
             writeOutputJsonIntoFile(Language.ENGLISH);      // Write outputs into a file
             writeOutputJsonIntoFile(Language.SINHALA);

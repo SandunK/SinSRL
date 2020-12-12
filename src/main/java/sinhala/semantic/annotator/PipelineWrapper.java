@@ -70,7 +70,7 @@ class PipelineWrapper {
     PipelineWrapper(Language language) {
 
         this.language = language;
-//        String languageString = language.toString().substring(0, 1).toUpperCase() + language.toString().substring(1).toLowerCase();
+        String languageString = language.toString().substring(0, 1).toUpperCase() + language.toString().substring(1).toLowerCase();
 
         //---------------------------------
         // StanfordNLP
@@ -84,6 +84,44 @@ class PipelineWrapper {
 
             // initialize STANFORD NLP
             pipeline = new StanfordCoreNLP(props);
+
+            //---------------------------------
+            // MATE tools
+            //---------------------------------
+            // use MATE semantic role labeler for English
+            if (language.equals(Language.ENGLISH)) {
+
+                se.lth.cs.srl.languages.Language.setLanguage(se.lth.cs.srl.languages.Language.L.eng);
+
+                // init MateSRL for English
+                ZipFile zipFile = null;
+                try {
+                    String srlModel = "srl-english.model";
+                    InputStream cpResource = this.getClass().getClassLoader().getResourceAsStream("models/" + srlModel);
+                    System.out.println("cpResource = " + cpResource);
+                    if (cpResource != null) {
+                        File tmpFile = null;
+                        try {
+                            tmpFile = File.createTempFile("file", "temp");
+                            FileUtils.copyInputStreamToFile(cpResource, tmpFile); // FileUtils from apache-io
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (tmpFile != null)
+                            try {
+                                String absolutePath = tmpFile.getAbsolutePath();
+                                zipFile = new ZipFile(absolutePath);
+                                semanticRoleLabeler = Pipeline.fromZipFile(zipFile);
+                                zipFile.close();
+                            } finally {
+                                boolean delete = tmpFile.delete();
+                            }
+                    }  // print warning
+
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -136,6 +174,15 @@ class PipelineWrapper {
                     }
                 }
 
+                // this is the Stanford dependency graph of the current sentence
+                SemanticGraph dependencies = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
+
+                for (SemanticGraphEdge semanticGraphEdge : dependencies.edgeIterable()) {
+
+                    parse.getToken(semanticGraphEdge.getDependent().index()).setDeprel(semanticGraphEdge.getRelation().getShortName());
+                    parse.getToken(semanticGraphEdge.getDependent().index()).setHeadId(semanticGraphEdge.getGovernor().index());
+                }
+
                 // Determine universal dependencies from tagset
                 toUniversalDependencies(parse);
 
@@ -143,6 +190,7 @@ class PipelineWrapper {
                     if (token.getHeadId() == 0) token.setDeprel("root");
                 }
 
+                // for rnglish SRL call AllenNLP
                 if (language.equals(Language.ENGLISH)) {
 
                     int size = parse.getHeadIds().size();
@@ -159,29 +207,52 @@ class PipelineWrapper {
                     ArrayList verbs = (ArrayList) englishSRL.get("verbs");
                     ArrayList words = (ArrayList) englishSRL.get("words");
 
-                    assert predicates != null;
-                    for (ArrayList<String> p : predicates) {
-                        try {
-                            Frame frame = parse.getTokenHasText(p.get(0)).addNewFrame(p.get(1));
-                            for (Object verbObject : verbs) {
-                                JSONObject verbJson = (JSONObject) verbObject;
-                                String verb = (String) verbJson.get("verb");
+                    // if Allen has no output try MATE tools
+                    if (verbs.size() == 0){
+                        // Only English currently has SRL
+                        if (language.equals(Language.ENGLISH) && semanticRoleLabeler != null) {
+                            se.lth.cs.srl.corpus.Sentence s = new se.lth.cs.srl.corpus.Sentence(
+                                    prepareFields(parse.getTexts()),
+                                    prepareFields(parse.getLemmas()),
+                                    prepareFields(parse.getPos()),
+                                    prepareFields(parse.getMorph()));
 
-                                if (verb.equals(p.get(0))) {
-                                    for (Token token : parse.getTokens()) {
-                                        ArrayList tags = (ArrayList) verbJson.get("tags");
-                                        if (words.contains(token.getText())) {
-                                            String tag = (String) tags.get(words.indexOf(token.getText()));
-                                            frame.addRole(new Role(tag, token, ""));
+                            s.setHeadsAndDeprels(heads, parse.getDeprels().toArray(new String[parse.getDeprels().size()]));
+                            semanticRoleLabeler.parseSentence(s);
+
+                            for (Predicate p : s.getPredicates()) {
+                                Frame frame = parse.getToken(p.getIdx()).addNewFrame(p.getSense());
+                                for (Word arg : p.getArgMap().keySet()) {
+                                    frame.addRole(new Role(p.getArgumentTag(arg), parse.getToken(arg.getIdx()), ""));
+                                }
+                            }
+                        }
+                    } else {
+                        assert predicates != null;
+                        for (ArrayList<String> p : predicates) {
+                            try {
+                                Frame frame = parse.getTokenHasText(p.get(0)).addNewFrame(p.get(1));
+                                for (Object verbObject : verbs) {
+                                    JSONObject verbJson = (JSONObject) verbObject;
+                                    String verb = (String) verbJson.get("verb");
+
+                                    if (verb.equals(p.get(0))) {
+                                        for (Token token : parse.getTokens()) {
+                                            ArrayList tags = (ArrayList) verbJson.get("tags");
+                                            if (words.contains(token.getText())) {
+                                                String tag = (String) tags.get(words.indexOf(token.getText()));
+                                                frame.addRole(new Role(tag, token, ""));
+                                            }
                                         }
                                     }
                                 }
+                            } catch (NullPointerException e){
+                                logger.error(e);
                             }
-                        } catch (NullPointerException e){
-                            logger.error(e);
-                        }
 
+                        }
                     }
+
                 }
                 return parse;
             }

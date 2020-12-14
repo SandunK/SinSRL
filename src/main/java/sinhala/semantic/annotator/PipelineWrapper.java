@@ -288,7 +288,7 @@ class PipelineWrapper {
                 String pos = posTagMap.get(word);
                 if (pos != null) {
                     if (pos.contains("V") && word.startsWith("නො")){
-                        JSONObject splitterResult = this.getBaseWord(word);
+                        JSONObject splitterResult = this.getBaseWordFromSinSRL(word);
 
                         if (splitterResult == null){
                             Token newtoken = parse.newToken().setText(word).setPos(pos);
@@ -308,11 +308,11 @@ class PipelineWrapper {
 
                     } else {
                         Token newtoken = parse.newToken().setText(word).setPos(pos);
-                        JSONObject splitterResult = this.getBaseWord(word); // get base word eg:දරුවාට base:දරුවා
+                        JSONObject splitterResult = this.getBaseWordFromSinMorphy(word); // get base word eg:දරුවාට base:දරුවා
                         if (splitterResult == null){
                             newtoken.setLemma("-");
                         } else {
-                            newtoken.setLemma((String) splitterResult.get("base"));
+                            newtoken.setLemma((String) splitterResult.get("debug"));
                         }
 
                     }
@@ -529,15 +529,13 @@ class PipelineWrapper {
      *
      * @param word original word
      */
-    private JSONObject getBaseWord(String word) {
-
-        Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + "/split";// put in your url
+    private JSONObject extractWord(String word, String postUrl){
         if (word.length() > 1) {
             Map<String, String> obj = new HashMap<>();
             obj.put("word", word);
             String jsonText = JSONValue.toJSONString(obj);
             logger.info(jsonText);
+//            logger.info(this.makeHttpPost(postUrl, jsonText));
             return this.makeHttpPost(postUrl, jsonText);
 //            if (result != null) {
 //                System.out.println((String) result.get("base"));
@@ -546,6 +544,20 @@ class PipelineWrapper {
         }
 //        return "-";
         return null;
+
+    }
+    private JSONObject getBaseWordFromSinMorphy(String word) {
+
+        Properties props = this.loadPropFile();
+        String postUrl = "http://" + props.getProperty("localhost") + "/getbaseword";// put in your url
+        return  extractWord(word,postUrl );
+    }
+
+    private JSONObject getBaseWordFromSinSRL(String word) {
+
+        Properties props = this.loadPropFile();
+        String postUrl = "http://" + props.getProperty("serverAddress") + "/split";// put in your url
+        return  extractWord(word,postUrl );
     }
 
 

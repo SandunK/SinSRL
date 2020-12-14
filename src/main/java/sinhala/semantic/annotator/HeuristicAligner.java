@@ -97,7 +97,6 @@ public class HeuristicAligner {
         }
     }
 
-
     // ------------------------------------------------------------------------
     // Methods for test initialization of HeuristicAligner (mostly for unit tests)
     // ------------------------------------------------------------------------

@@ -227,6 +227,7 @@ public class BiSentence {
         return this;
     }
 
+
     /**
      * Return aligned token if one exists, else returns null
      *

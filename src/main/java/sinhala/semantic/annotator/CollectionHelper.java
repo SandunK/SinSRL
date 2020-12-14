@@ -8,7 +8,6 @@ import java.util.TreeSet;
  * Set of methods to help with collections and maps.
  */
 public class CollectionHelper {
-
     /**
      * Sort this map by value, descending.
      *

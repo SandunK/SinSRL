@@ -119,7 +119,6 @@ public class AnnotationTransfer {
         }
     }
 
-
     /**
      * Transfer all annotations (PoS, dependencies, SRL) from source to target in BiSentence
      *

@@ -461,6 +461,7 @@ class PipelineWrapper {
         }
     }
 
+
     /**
      * Method to get English SRL from AllenNLP Toolkit
      * @param sentence sentence to annotate

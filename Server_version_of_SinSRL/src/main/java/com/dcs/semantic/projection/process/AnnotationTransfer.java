@@ -79,6 +79,7 @@ public class AnnotationTransfer {
         }
     }
 
+
     /**
      * Method that transfers SRL (frames and roles in a BiSentence)
      *

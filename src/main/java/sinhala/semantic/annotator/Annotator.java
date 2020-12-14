@@ -81,6 +81,7 @@ public class Annotator {
         return output.toString();
     }
 
+
     /**
      * Method to write json outputs into a file
      * @param language language object

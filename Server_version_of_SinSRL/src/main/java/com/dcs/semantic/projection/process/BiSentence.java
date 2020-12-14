@@ -28,6 +28,7 @@ public class BiSentence {
     // Word alignments between both sentences
     Table<Token, Token, Double> aligments = HashBasedTable.create();
 
+
     /**
      * Constructor for the bisentence. Requires source and target sentences.
      *

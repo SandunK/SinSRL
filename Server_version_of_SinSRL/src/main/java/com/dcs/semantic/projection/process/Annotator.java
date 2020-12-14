@@ -66,6 +66,7 @@ public class Annotator {
         return outputSentence;
     }
 
+
     /**
      * Method to replace punctuations with a space
      * @param sentence input sentence

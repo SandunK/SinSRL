@@ -29,7 +29,7 @@ public class Annotator {
         // tokenizing
         SinhalaTokenizerMain tokenizer = new SinhalaTokenizerMain();
         try {
-            tokenizer.tokenize("test.si");
+            tokenizer.tokenize("input.si");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,8 +37,8 @@ public class Annotator {
         // Initiate scanner
 //        Scanner sc = new Scanner(System.in);
 
-        File siObj = new File("test.si.tok");
-        File enObj = new File("test.en");
+        File siObj = new File("input.si.tok");
+        File enObj = new File("input.en");
 
 
         try {

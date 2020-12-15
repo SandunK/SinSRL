@@ -30,8 +30,8 @@ This is the [SinLing project](https://github.com/ysenarath/sinling) as a Word Sp
 6. Start and enable the created service
 
     ```
-   sudo systemctl start flair
-   sudo systemctl enable flair
+   sudo systemctl start splitter
+   sudo systemctl enable splitter
     ```
 
 7. Let's configure nginx server
@@ -40,7 +40,7 @@ This is the [SinLing project](https://github.com/ysenarath/sinling) as a Word Sp
 
     ```
     location /split{
-       proxy_pass http://unix:<<project absolute path>>/flair.sock;
+       proxy_pass http://unix:<<project absolute path>>/splitter.sock;
     }
     ```
 

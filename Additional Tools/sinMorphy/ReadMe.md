@@ -1,49 +1,27 @@
 # SinMorphy - Sinhala morphological analyzer 
 
-# SinMorphy 
-
-SinMorphy is Sinhala morphological analyzer. You can use this tool to get the base word of the given word. 
-
-### Installation
-
-SinMorphy requires some python packages to run.
-
- - Install python 3
- - Install pip compatible with python 3
- - Install flask
- - Intsall flask_restful
-
-
-Now, you can run end_points.py then SinMorphy will run on your local machine.After successfully run SinMorphy.You can call http://{host}:{port}/getbaseword which is a post request. 
-
-Make sure to send JSON body which contains 'word' field with you word as the value. look at below example,
-
-    {
-    "word":"හඬ"
-    }
-    
 [SinMorphy](http://nlp-tools.uom.lk/sin-morphy/#) is Sinhala morphological analyzer which can get base word of a Sinhala word with much more linguistic information.
 
 ## Instructions for server deployment (Inside CentOS 7 VM)
 
 ``` NOTE: VM should have installed nginx server and python 3 before proceed with below steps```
 1. Create a python virtual environment `python3 -m venv sinmorphyEnv`
-2. Install flask(1.1.2), gunicorn(20.0.4) and flask_restful(0.6.0) within the environment `pip install  flask_restful gunicorn flask`
+2. Install flask(1.1.2), gunicorn(20.0.4),fst-lookup(2020.5.24.post8) and flask_restful(0.3.8) within the environment `pip install  flask_restful gunicorn flask`
 3. Add project files into the VM
-4. Create a system service using `sudo vim /etc/systemd/system/flair.service`
+4. Create a system service using `sudo vim /etc/systemd/system/sinmorphy.service`
 5. Edit the file content as follows
 
     ```
     [Unit]
-    Description=Service to serve sinhala word splitter
+    Description=Service to serve SinMorphy
     After=network.target
     
     [Service]
     User=<<Username>>
     Group=nginx
-    WorkingDirectory=<<Project absolute path>> [remove this!! eg: /home/<<username>>/sinhalaWordsplitter]
-    Environment="PATH=<<Python envirenment bin folder path>>"  [remove this!! eg: /home/<<username>>/splitterEnv/bin]
-    ExecStart=<<Python envirenment bin folder path>>/gunicorn --workers 1 --bind unix:splitter.sock -m 007 wsgi
+    WorkingDirectory=<<Project absolute path>> [remove this!! eg: /home/<<username>>/sinMorphy]
+    Environment="PATH=<<Python envirenment bin folder path>>"  [remove this!! eg: /home/<<username>>/sinmorphyEnv/bin]
+    ExecStart=<<Python envirenment bin folder path>>/gunicorn --workers 1 --bind unix:sinmorphy.sock -m 007 wsgi
     
     [Install]
     WantedBy=multi-user.target
@@ -52,8 +30,8 @@ Make sure to send JSON body which contains 'word' field with you word as the val
 6. Start and enable the created service
 
     ```
-   sudo systemctl start flair
-   sudo systemctl enable flair
+   sudo systemctl start sinmorphy
+   sudo systemctl enable sinmorphy
     ```
 
 7. Let's configure nginx server
@@ -62,7 +40,7 @@ Make sure to send JSON body which contains 'word' field with you word as the val
 
     ```
     location /split{
-       proxy_pass http://unix:<<project absolute path>>/flair.sock;
+       proxy_pass http://unix:<<project absolute path>>/sinmorphy.sock;
     }
     ```
 
@@ -80,14 +58,14 @@ Make sure to send JSON body which contains 'word' field with you word as the val
     sudo usermod -a -G <<username>> nginx
     chmod 710 /home/<<username>> (if not work use sudo)
     sudo systemctl restart nginx
-    sudo systemctl restart splitter
+    sudo systemctl restart sinmorphy
     sudo cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M mynginx
     sudo semodule -i mynginx.pp
     sudo systemctl restart nginx
-    sudo systemctl restart splitter
+    sudo systemctl restart sinmorphy
     ```
 
-11. Access the service sending post request to `http://serveraddress/getpredicates`
+11. Access the service sending post request to `http://serveraddress/getbaseword`
 `NOTE: Object structure {"word":""}`
 
 [TUTORIAL](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-centos-7)

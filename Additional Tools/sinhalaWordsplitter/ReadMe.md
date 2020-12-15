@@ -5,6 +5,9 @@ This is the [SinLing project](https://github.com/ysenarath/sinling) as a Word Sp
 ## Instructions for server deployment (Inside CentOS 7 VM)
 
 ``` NOTE: VM should have installed nginx server and python 3 before proceed with below steps```
+
+``IMPORTANT!! Refer SinLing project installation guid before start to setup``
+
 1. Create a python virtual environment `python3 -m venv splitterEnv`
 2. Install nltk(3.5), flask(1.1.2), gunicorn(20.0.4) and emoji(0.6.0) within the envirenment `pip install emoji nltk gunicorn flask`
 3. Add project files into the VM

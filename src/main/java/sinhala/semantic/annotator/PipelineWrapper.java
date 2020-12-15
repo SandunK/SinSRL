@@ -547,7 +547,7 @@ class PipelineWrapper {
     private JSONObject getBaseWordFromSinMorphy(String word) {
 
         Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("localhost") + "/getbaseword";// put in your url
+        String postUrl = "http://" + props.getProperty("serverAddress") + "/getbaseword";// put in your url
         return  extractWord(word,postUrl );
     }
 

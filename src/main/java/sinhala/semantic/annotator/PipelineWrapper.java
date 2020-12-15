@@ -221,7 +221,7 @@ class PipelineWrapper {
                             for (Predicate p : s.getPredicates()) {
                                 Frame frame = parse.getToken(p.getIdx()).addNewFrame(p.getSense());
                                 for (Word arg : p.getArgMap().keySet()) {
-                                    frame.addRole(new Role(p.getArgumentTag(arg), parse.getToken(arg.getIdx()), ""));
+                                    frame.addRole(new Role(p.getArgumentTag(arg).replace("A","B-ARG"), parse.getToken(arg.getIdx()), "be"));
                                 }
                             }
                         }

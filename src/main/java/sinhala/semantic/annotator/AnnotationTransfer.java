@@ -108,9 +108,41 @@ public class AnnotationTransfer {
 
                     // If we can project the frame, we must check if we can project the roles
                     for (Role role : tokenSL.getFrame().getRoles()) {
-                        if (biSentence.getAligned(role.getRoleHead())!=null){
-                            frame.addRole(new Role(role.getRoleLabel(), biSentence.getAligned(role.getRoleHead()), ""));
+
+                        if (role.getConstituent().equals("be")){
+                            Constituent constituentSL = role.getRoleHead().getConstituent(tokenSL);
+                            logger.debug("Source Constituent: " + constituentSL);
+                            Constituent constituentAligned = new Constituent(Lists.newArrayList());
+                            for (Token token : constituentSL.getTokens()) {
+                                if (biSentence.getAligned(token) != null)
+                                    constituentAligned.getTokens().add(biSentence.getAligned(token));
+                            }
+                            logger.debug("   ---   projected as: " + constituentAligned);
+
+                            Constituent bestTLcontituent = null;
+                            double highestSimilarity = 0.;
+                            for (Constituent constituent : constituentsTL) {
+                                double jaccardSimilarity = constituentAligned.jaccardSimilarity(constituent);
+                                if (jaccardSimilarity > highestSimilarity) {
+                                    highestSimilarity = jaccardSimilarity;
+                                    bestTLcontituent = constituent;
+                                }
+                            }
+                            logger.debug("   ---   best matching TL constituent: " + highestSimilarity + "\t" + bestTLcontituent);
+                            if (bestTLcontituent != null) {
+                                // Changed Role object structure
+                                frame.addRole(new Role(role.getRoleLabel(), bestTLcontituent.getHead(), bestTLcontituent.toString()));
+                            } else {
+                                if (biSentence.getAligned(role.getRoleHead())!=null){
+                                    frame.addRole(new Role(role.getRoleLabel(), biSentence.getAligned(role.getRoleHead()), ""));
+                                }
+                            }
+                        } else {
+                            if (biSentence.getAligned(role.getRoleHead())!=null){
+                                frame.addRole(new Role(role.getRoleLabel(), biSentence.getAligned(role.getRoleHead()), ""));
+                            }
                         }
+
                     }
                 }
             } else {

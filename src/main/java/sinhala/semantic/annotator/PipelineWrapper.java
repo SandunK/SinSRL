@@ -10,7 +10,6 @@ import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
-import is2.data.SentenceData09;
 import is2.lemmatizer.Lemmatizer;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
@@ -32,7 +31,6 @@ import org.apache.logging.log4j.Logger;
 //import zalando.analytics.base.*;
 //import zalando.analytics.base.Language;
 
-import javax.json.JsonObject;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -288,7 +286,7 @@ class PipelineWrapper {
                 String pos = posTagMap.get(word);
                 if (pos != null) {
                     if (pos.contains("V") && word.startsWith("නො")){
-                        JSONObject splitterResult = this.getBaseWordFromSinSRL(word);
+                        JSONObject splitterResult = this.getBaseWordFromSinLing(word);
 
                         if (splitterResult == null){
                             Token newtoken = parse.newToken().setText(word).setPos(pos);
@@ -553,7 +551,7 @@ class PipelineWrapper {
         return  extractWord(word,postUrl );
     }
 
-    private JSONObject getBaseWordFromSinSRL(String word) {
+    private JSONObject getBaseWordFromSinLing(String word) {
 
         Properties props = this.loadPropFile();
         String postUrl = "http://" + props.getProperty("serverAddress") + "/split";// put in your url

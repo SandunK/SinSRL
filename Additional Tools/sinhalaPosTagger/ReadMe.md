@@ -17,7 +17,7 @@ This is the Sinhala PosTagger using tnt tool
     ```
     ``Note: above script for add tnt folder path into PATH variables. edit the above script according to the requirements of the instance``
 
-7. Give execution permission to both jar file and tnt/tnt file
+7. Give execution permission to tnt/tnt file
 
     ```
    sudo chmod +x /home/<<username>>/sinhalaPosTagger/tnt/tnt
@@ -54,6 +54,6 @@ This is the Sinhala PosTagger using tnt tool
 
 12. Please make sure sure to change the file paths in ProcessSentence.java file into absolute paths if there is any error regarding accessing files
 
-```TUTORIAL: https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-centos-7```
+[TUTORIAL](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-centos-7)
 
 DONE!!

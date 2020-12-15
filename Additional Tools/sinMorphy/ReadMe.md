@@ -1,27 +1,49 @@
-# Flair Predicate Identifier
+# SinMorphy - Sinhala morphological analyzer 
 
-This is English predicate identifier using Flair toolkit
+# SinMorphy 
+
+SinMorphy is Sinhala morphological analyzer. You can use this tool to get the base word of the given word. 
+
+### Installation
+
+SinMorphy requires some python packages to run.
+
+ - Install python 3
+ - Install pip compatible with python 3
+ - Install flask
+ - Intsall flask_restful
+
+
+Now, you can run end_points.py then SinMorphy will run on your local machine.After successfully run SinMorphy.You can call http://{host}:{port}/getbaseword which is a post request. 
+
+Make sure to send JSON body which contains 'word' field with you word as the value. look at below example,
+
+    {
+    "word":"හඬ"
+    }
+    
+[SinMorphy](http://nlp-tools.uom.lk/sin-morphy/#) is Sinhala morphological analyzer which can get base word of a Sinhala word with much more linguistic information.
 
 ## Instructions for server deployment (Inside CentOS 7 VM)
 
 ``` NOTE: VM should have installed nginx server and python 3 before proceed with below steps```
-1. Create a python virtual environment `python3 -m venv flairEnv`
-2. Install flair(0.7), flask(1.1.2) and gunicorn(20.0.4) within the envirenment `pip install flair gunicorn flask`
+1. Create a python virtual environment `python3 -m venv sinmorphyEnv`
+2. Install flask(1.1.2), gunicorn(20.0.4) and flask_restful(0.6.0) within the environment `pip install  flask_restful gunicorn flask`
 3. Add project files into the VM
 4. Create a system service using `sudo vim /etc/systemd/system/flair.service`
 5. Edit the file content as follows
 
     ```
     [Unit]
-    Description=English Predicate flair
+    Description=Service to serve sinhala word splitter
     After=network.target
     
     [Service]
     User=<<Username>>
     Group=nginx
-    WorkingDirectory=<<Project absolute path>> [remove this!! eg: /home/<<username>>/EnglishPredicateIdentifier]
-    Environment="PATH=<<Python envirenment bin folder path>>"  [remove this!! eg: /home/<<username>>/flairEnv/bin]
-    ExecStart=<<Python envirenment bin folder path>>/gunicorn --workers 1 --bind unix:flair.sock -m 007 wsgi
+    WorkingDirectory=<<Project absolute path>> [remove this!! eg: /home/<<username>>/sinhalaWordsplitter]
+    Environment="PATH=<<Python envirenment bin folder path>>"  [remove this!! eg: /home/<<username>>/splitterEnv/bin]
+    ExecStart=<<Python envirenment bin folder path>>/gunicorn --workers 1 --bind unix:splitter.sock -m 007 wsgi
     
     [Install]
     WantedBy=multi-user.target
@@ -39,7 +61,7 @@ This is English predicate identifier using Flair toolkit
 9. insert following configurations under the default server block. NOTE : Here we used default http server to access the service. Otherwise if you use another server create new server block in the conf file. For more info refer attached tutorial
 
     ```
-    location /getpredicates{
+    location /split{
        proxy_pass http://unix:<<project absolute path>>/flair.sock;
     }
     ```
@@ -51,18 +73,18 @@ This is English predicate identifier using Flair toolkit
     sudo systemctl enable nginx
     ```
     
-11. run below commands to configure the nginx(needed only one time after installing nginx)
+11. run below commands to configure the nginx (only one time after installing nginx)
     ```
     sudo yum install policycoreutils-devel
     sudo setsebool httpd_can_network_connect on -P
     sudo usermod -a -G <<username>> nginx
     chmod 710 /home/<<username>> (if not work use sudo)
     sudo systemctl restart nginx
-    sudo systemctl restart flair
+    sudo systemctl restart splitter
     sudo cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M mynginx
     sudo semodule -i mynginx.pp
     sudo systemctl restart nginx
-    sudo systemctl restart flair
+    sudo systemctl restart splitter
     ```
 
 11. Access the service sending post request to `http://serveraddress/getpredicates`

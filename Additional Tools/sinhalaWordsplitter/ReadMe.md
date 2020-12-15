@@ -68,6 +68,6 @@ This is the [SinLing project](https://github.com/ysenarath/sinling) as a Word Sp
 11. Access the service sending post request to `http://serveraddress/getpredicates`
 `NOTE: Object structure {"word":""}`
 
-```TUTORIAL: https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-centos-7```
+[TUTORIAL](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-centos-7)
 
 DONE!!

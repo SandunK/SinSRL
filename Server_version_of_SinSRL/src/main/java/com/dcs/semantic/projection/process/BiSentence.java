@@ -28,7 +28,6 @@ public class BiSentence {
     // Word alignments between both sentences
     Table<Token, Token, Double> aligments = HashBasedTable.create();
 
-
     /**
      * Constructor for the bisentence. Requires source and target sentences.
      *
@@ -228,6 +227,7 @@ public class BiSentence {
         return this;
     }
 
+
     /**
      * Return aligned token if one exists, else returns null
      *
@@ -332,20 +332,29 @@ public class BiSentence {
                 Map<String, String> tokenJsonObj = new HashMap<>();
                 ArrayList<String> frameLst = new ArrayList<>();
                 for (Frame frame : sentence.getFrames()) {
-                    if (frame.hasTokenRole(tl)) {
+//                    if (frame.hasTokenRole(tl)) {
                         if (tl.evokesFrame()) {
-                            String roleLabel = frame.getTokenRole(tl);
-                            if (roleLabel.equals("B-V")) {
+                            if (frame.hasTokenRole(tl)) {
+                                String roleLabel = frame.getTokenRole(tl);
+                                if (roleLabel.equals("B-V")) {
+                                    tokenJsonObj.put("text", tl.getText());
+                                    tokenJsonObj.put("frame", tl.getFrame().getLabel());
+                                    if (!frameLst.contains(tl.getFrame().getLabel())) {          // Check whether frame label available to avoid repetition
+                                        frameLst.add(tl.getFrame().getLabel());
+                                    }
+                                } else {
+                                    tokenJsonObj.put("text", tl.getText());
+                                    tokenJsonObj.put("frame", frame.getTokenRole(tl));
+                                    frameLst.add(frame.getTokenRole(tl)); // Add tokenroles into list
+                                }
+                            } else {
                                 tokenJsonObj.put("text", tl.getText());
                                 tokenJsonObj.put("frame", tl.getFrame().getLabel());
                                 if (!frameLst.contains(tl.getFrame().getLabel())) {          // Check whether frame label available to avoid repetition
                                     frameLst.add(tl.getFrame().getLabel());
                                 }
-                            } else {
-                                tokenJsonObj.put("text", tl.getText());
-                                tokenJsonObj.put("frame", frame.getTokenRole(tl));
-                                frameLst.add(frame.getTokenRole(tl)); // Add tokenroles into list
                             }
+
                         } else {
                             if (frame.getTokenRole(tl) != null) {
                                 tokenJsonObj.put("text", tl.getText());
@@ -353,11 +362,8 @@ public class BiSentence {
                                 frameLst.add(frame.getTokenRole(tl)); // Add tokenroles into list
                             } else {
                                 tokenJsonObj.put("text", tl.getText());
-                                tokenJsonObj.put("frame", tl.getFrame().getLabel());
-                                if (!frameLst.contains(tl.getFrame().getLabel())) {          // Check whether frame label available to avoid repetition
-                                    frameLst.add(tl.getFrame().getLabel());
-                                }
-
+                                tokenJsonObj.put("frame", "O");
+                                frameLst.add("O");
                             }
                         }
 //                    } else if (tl.evokesFrame()) {
@@ -367,7 +373,7 @@ public class BiSentence {
 //                        if (!frameLst.contains(tl.getFrame().getLabel())) {          // Check whether frame label available to avoid repetition
 //                            frameLst.add(tl.getFrame().getLabel());
 //                        }
-                    }
+//                    }
 //                    } else {
 //                            tokenJsonObj.put("text", tl.getText());
 ////                    tokenJsonObj.put("pos", tl.getPos());
@@ -409,43 +415,52 @@ public class BiSentence {
         JSONParser parser = new JSONParser();
 
         for (JSONObject token : jsonLst) {
-            if (token.get("frame").equals("[_]")) {
+            if (token.get("frame").equals("[O]")) {
                 missingIndexes.add(jsonLst.indexOf(token));
             }
         }
 
         List<List<Integer>> ranges = getConsecutiveRanges(missingIndexes);
 
-        for (List<Integer> range:ranges){
-            if (range.size()==0){
+        for (List<Integer> range:ranges) {
+            Integer startIndex;
+            Integer endIndex;
+
+            if (range.size() == 0) {
                 continue;
-            } else if(range.size()==1){
+            } else if (range.size() == 1) {
                 Integer index = range.get(0);
-                String prevTag = (String) jsonLst.get(index-1).get("frame");
-                String afterTag = (String) jsonLst.get(index+1).get("frame");
-                if (prevTag.equals(afterTag)){
-                    String tags = prevTag.substring(0,prevTag.length());
+                if (index == 0) {
+                    String nextTag = (String) jsonLst.get(1).get("frame");
+                    nextTag = nextTag.substring(nextTag.indexOf("-") + 1, nextTag.length() - 1);
+
+                    replaceMissingTags(jsonLst,parser,0,0,nextTag);
+
+                    continue;
+                } else if (index == jsonLst.size() - 1) {
+                    continue;
+                } else {
+                    startIndex = index;
+                    endIndex = index;
                 }
+
             } else {
-                Integer startIndex = range.get(0);
-                Integer endIndex = range.get(1);
+                startIndex = range.get(0);
+                endIndex = range.get(1);
+            }
+
+            if(startIndex == 0){
+                String afterTag = (String) jsonLst.get(endIndex+1).get("frame");
+                afterTag = afterTag.substring(afterTag.indexOf("-")+1,afterTag.length()-1);
+
+                replaceMissingTags(jsonLst, parser, startIndex, endIndex, afterTag);
+            }else if (endIndex < jsonLst.size()-1){
                 String prevTag = (String) jsonLst.get(startIndex-1).get("frame");
                 String afterTag = (String) jsonLst.get(endIndex+1).get("frame");
                 prevTag = prevTag.substring(prevTag.indexOf("-")+1,prevTag.length()-1);
                 afterTag = afterTag.substring(afterTag.indexOf("-")+1,afterTag.length()-1);
                 if (prevTag.equals(afterTag)){
-                    for (int i = startIndex;i<=endIndex;i++){
-                        JSONObject tokenObject = jsonLst.get(i);
-                        Map<String, String> tokenJsonObj = new HashMap<>();
-                        tokenJsonObj.put("text", (String) tokenObject.get("text"));
-                        tokenJsonObj.put("frame", "[I-"+prevTag+"]");
-
-                        try {
-                            jsonLst.add(i,(JSONObject) parser.parse(JSONValue.toJSONString(tokenJsonObj)));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    replaceMissingTags(jsonLst, parser, startIndex, endIndex, prevTag);
                 }
             }
 
@@ -454,11 +469,34 @@ public class BiSentence {
     }
 
     /**
+     * Method to replace the identified missing tags
+     * @param jsonLst list of json objects for tags
+     * @param parser json parser
+     * @param startIndex Start index of the range replace
+     * @param endIndex last index of the range to replace
+     * @param replacingTag tag to replace
+     */
+    private void replaceMissingTags(ArrayList<JSONObject> jsonLst, JSONParser parser, Integer startIndex, Integer endIndex, String replacingTag) {
+        for (int i = startIndex;i<=endIndex;i++){
+            JSONObject tokenObject = jsonLst.get(i);
+            Map<String, String> tokenJsonObj = new HashMap<>();
+            tokenJsonObj.put("text", (String) tokenObject.get("text"));
+            tokenJsonObj.put("frame", "[I-"+replacingTag+"]");
+
+            try {
+                jsonLst.set(i,(JSONObject) parser.parse(JSONValue.toJSONString(tokenJsonObj)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * Method to find consecutive index ranges
      * @param a integer list
      * @return list of lists containing ranges
      */
-    static List<List<Integer>> getConsecutiveRanges ( ArrayList<Integer> a){
+    private static List<List<Integer>> getConsecutiveRanges(ArrayList<Integer> a){
         int length = 1;
         List<List<Integer>> list = new ArrayList<List<Integer>>();
         // If the array is empty,

@@ -48,6 +48,6 @@ Thumbs.db
 /target
 outputENGLISH.json
 outputSINHALA.json
-test.en
-test.si
-test.si.tok
+input.en
+input.si
+input.si.tok

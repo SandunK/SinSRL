@@ -1,4 +1,4 @@
-package com.dcs.semantic.projection.process;
+package sinhala.semantic.annotator;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
@@ -349,10 +349,8 @@ public class BiSentence {
                                 }
                             } else {
                                 tokenJsonObj.put("text", tl.getText());
-                                tokenJsonObj.put("frame", tl.getFrame().getLabel());
-                                if (!frameLst.contains(tl.getFrame().getLabel())) {          // Check whether frame label available to avoid repetition
-                                    frameLst.add(tl.getFrame().getLabel());
-                                }
+                                tokenJsonObj.put("frame", "O");
+                                frameLst.add("O");
                             }
 
                         } else {

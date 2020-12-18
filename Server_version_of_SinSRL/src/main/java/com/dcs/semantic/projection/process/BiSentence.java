@@ -447,11 +447,14 @@ public class BiSentence {
                 endIndex = range.get(1);
             }
 
-            if(startIndex == 0){
+            if(startIndex == 0 && endIndex < jsonLst.size()-1){
                 String afterTag = (String) jsonLst.get(endIndex+1).get("frame");
-                afterTag = afterTag.substring(afterTag.indexOf("-")+1,afterTag.length()-1);
+                if (!afterTag.contains(".")) {
+                    afterTag = afterTag.substring(afterTag.indexOf("-") + 1, afterTag.length() - 1);
+                    replaceMissingTags(jsonLst, parser, startIndex, endIndex, afterTag);
+                }
 
-                replaceMissingTags(jsonLst, parser, startIndex, endIndex, afterTag);
+
             }else if (endIndex < jsonLst.size()-1){
                 String prevTag = (String) jsonLst.get(startIndex-1).get("frame");
                 String afterTag = (String) jsonLst.get(endIndex+1).get("frame");

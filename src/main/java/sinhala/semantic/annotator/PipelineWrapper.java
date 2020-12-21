@@ -309,8 +309,10 @@ class PipelineWrapper {
                         JSONObject splitterResult = this.getBaseWordFromSinMorphy(word); // get base word eg:දරුවාට base:දරුවා
                         if (splitterResult == null){
                             newtoken.setLemma("-");
+                            logger.error("No results !!");
                         } else {
                             newtoken.setLemma((String) splitterResult.get("debug"));
+                            logger.info(splitterResult.get("debug"));
                         }
 
                     }

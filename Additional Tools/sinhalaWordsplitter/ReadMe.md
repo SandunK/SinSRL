@@ -67,7 +67,7 @@ This is the [SinLing project](https://github.com/ysenarath/sinling) as a Word Sp
     sudo systemctl restart nginx
     sudo systemctl restart splitter
     ```
-12. change the sinling directory's path in app.py ```[ remove this!!  eg :sys.path.insert(0, "/home/<<username>>/sinhalaWordsplitter/sinling")]```
+12. change the sinling directory's path in app.py `[ remove this!!  eg :sys.path.insert(0, "/home/<<username>>/sinhalaWordsplitter/sinling")] `
 13. Access the service sending post request to `http://serveraddress/split`
 `NOTE: Object structure {"word":""}`
 

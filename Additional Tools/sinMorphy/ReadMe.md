@@ -56,7 +56,7 @@
     sudo yum install policycoreutils-devel
     sudo setsebool httpd_can_network_connect on -P
     sudo usermod -a -G <<username>> nginx
-    chmod 710 /home/<<username>> (if not work use sudo)
+    sudo chmod 710 /home/<<username>>
     sudo systemctl restart nginx
     sudo systemctl restart sinmorphy
     sudo cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M mynginx

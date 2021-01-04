@@ -39,7 +39,7 @@
 9. insert following configurations under the default server block. NOTE : Here we used default http server to access the service. Otherwise if you use another server create new server block in the conf file. For more info refer attached tutorial
 
     ```
-    location /split{
+    location /getbaseword{
        proxy_pass http://unix:<<project absolute path>>/sinmorphy.sock;
     }
     ```

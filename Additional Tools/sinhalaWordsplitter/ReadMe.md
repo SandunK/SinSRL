@@ -11,7 +11,7 @@ This is the [SinLing project](https://github.com/ysenarath/sinling) as a Word Sp
 1. Create a python virtual environment `python3 -m venv splitterEnv`
 2. Install nltk(3.5), flask(1.1.2), gunicorn(20.0.4) and emoji(0.6.0) within the envirenment `pip install emoji nltk gunicorn flask`
 3. Add project files into the VM
-4. Create a system service using `sudo vim /etc/systemd/system/flair.service`
+4. Create a system service using `sudo vim /etc/systemd/system/splitter.service`
 5. Edit the file content as follows
 
     ```
@@ -67,8 +67,8 @@ This is the [SinLing project](https://github.com/ysenarath/sinling) as a Word Sp
     sudo systemctl restart nginx
     sudo systemctl restart splitter
     ```
-
-11. Access the service sending post request to `http://serveraddress/getpredicates`
+12. change the sinling directory's path in app.py [ remove this!!  eg :sys.path.insert(0, "/home/<<username>>/sinhalaWordsplitter/sinling")]
+13. Access the service sending post request to `http://serveraddress/split`
 `NOTE: Object structure {"word":""}`
 
 [TUTORIAL](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-centos-7)

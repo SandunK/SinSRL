@@ -39,7 +39,7 @@
 9. insert following configurations under the default server block. NOTE : Here we used default http server to access the service. Otherwise if you use another server create new server block in the conf file. For more info refer attached tutorial
 
     ```
-    location /split{
+    location /getbaseword{
        proxy_pass http://unix:<<project absolute path>>/sinmorphy.sock;
     }
     ```
@@ -56,7 +56,7 @@
     sudo yum install policycoreutils-devel
     sudo setsebool httpd_can_network_connect on -P
     sudo usermod -a -G <<username>> nginx
-    chmod 710 /home/<<username>> (if not work use sudo)
+    sudo chmod 710 /home/<<username>>
     sudo systemctl restart nginx
     sudo systemctl restart sinmorphy
     sudo cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M mynginx

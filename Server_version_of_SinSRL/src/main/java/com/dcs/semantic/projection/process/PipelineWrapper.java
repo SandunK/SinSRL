@@ -236,12 +236,12 @@ class PipelineWrapper {
                         assert predicates != null;
                         for (ArrayList<String> p : predicates) {
                             try {
-                                Frame frame = parse.getTokenHasText(p.get(0)).addNewFrame(p.get(1));
                                 for (Object verbObject : verbs) {
                                     JSONObject verbJson = (JSONObject) verbObject;
                                     String verb = (String) verbJson.get("verb");
 
                                     if (verb.equals(p.get(0))) {
+                                        Frame frame = parse.getTokenHasText(p.get(0)).addNewFrame(p.get(1));
                                         for (Token token : parse.getTokens()) {
                                             ArrayList tags = (ArrayList) verbJson.get("tags");
                                             if (words.contains(token.getText())) {

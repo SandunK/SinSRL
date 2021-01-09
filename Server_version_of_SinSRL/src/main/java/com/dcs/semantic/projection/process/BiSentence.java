@@ -1,5 +1,6 @@
-package sinhala.semantic.annotator;
+package com.dcs.semantic.projection.process;
 
+import com.dcs.semantic.projection.process.Sentence;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -17,6 +18,7 @@ import java.util.*;
  * Class that holds a bisentence, i.e. two sentences that are translations of each other. One of the sentences is the
  * source sentence, while the other is the target (for the purpose of annotation projection).
  */
+
 public class BiSentence {
 
     // The source side of the bisentence
@@ -430,10 +432,10 @@ public class BiSentence {
                 Integer index = range.get(0);
                 if (index == 0) {
                     String nextTag = (String) jsonLst.get(1).get("frame");
-                    nextTag = nextTag.substring(nextTag.indexOf("-") + 1, nextTag.length() - 1);
-
-                    replaceMissingTags(jsonLst,parser,0,0,nextTag);
-
+                    if (!nextTag.contains(".")) {
+                        nextTag = nextTag.substring(nextTag.indexOf("-") + 1, nextTag.length() - 1);
+                        replaceMissingTags(jsonLst, parser, 0, 0, nextTag);
+                    }
                     continue;
                 } else if (index == jsonLst.size() - 1) {
                     continue;

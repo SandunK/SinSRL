@@ -247,10 +247,8 @@ class PipelineWrapper {
                             } catch (NullPointerException e){
                                 logger.error(e);
                             }
-
                         }
                     }
-
                 }
                 return parse;
             }

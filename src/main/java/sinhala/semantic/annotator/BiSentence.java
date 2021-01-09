@@ -430,10 +430,10 @@ public class BiSentence {
                 Integer index = range.get(0);
                 if (index == 0) {
                     String nextTag = (String) jsonLst.get(1).get("frame");
-                    nextTag = nextTag.substring(nextTag.indexOf("-") + 1, nextTag.length() - 1);
-
-                    replaceMissingTags(jsonLst,parser,0,0,nextTag);
-
+                    if (!nextTag.contains(".")) {
+                        nextTag = nextTag.substring(nextTag.indexOf("-") + 1, nextTag.length() - 1);
+                        replaceMissingTags(jsonLst, parser, 0, 0, nextTag);
+                    }
                     continue;
                 } else if (index == jsonLst.size() - 1) {
                     continue;

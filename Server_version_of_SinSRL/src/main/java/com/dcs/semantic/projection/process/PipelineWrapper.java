@@ -554,15 +554,15 @@ class PipelineWrapper {
     }
     private JSONObject getBaseWordFromSinMorphy(String word) {
 
-        Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + "/getbaseword";// put in your url
+//        Properties props = this.loadPropFile();
+        String postUrl = "http://" + serverAddress + "/getbaseword";// put in your url
         return  extractWord(word,postUrl );
     }
 
     private JSONObject getBaseWordFromSinLing(String word) {
 
-        Properties props = this.loadPropFile();
-        String postUrl = "http://" + props.getProperty("serverAddress") + "/split";// put in your url
+//        Properties props = this.loadPropFile();
+        String postUrl = "http://" + serverAddress + "/split";// put in your url
         return  extractWord(word,postUrl );
     }
 

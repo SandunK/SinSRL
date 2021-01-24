@@ -350,7 +350,7 @@ class PipelineWrapper {
      */
     private ArrayList<ArrayList<String>> getPredicates (String sentence){
         ArrayList<ArrayList<String>> predicates = new ArrayList<>();
-        Properties props = this.loadPropFile();
+//        Properties props = this.loadPropFile();
         String postUrl = "http://" + serverAddress + "/getpredicates";// put in your url
         Map<String, String> obj = new HashMap<>();
         obj.put("word", sentence);
@@ -577,7 +577,7 @@ class PipelineWrapper {
         String str[] = text.split(" ");     // Whitespace tokenizing
         List<String> wordList = new ArrayList<>(Arrays.asList(str));
         wordList.removeIf(t -> t.equals("")); // remove spaces in the middle of a sentence
-        Properties props = this.loadPropFile();
+//        Properties props = this.loadPropFile();
         String postUrl = "http://" + serverAddress + "/getpos";// put in your url
         Map<String, String> postagMap = new HashMap<String, String>();
         String sentence = String.join(" ",wordList);

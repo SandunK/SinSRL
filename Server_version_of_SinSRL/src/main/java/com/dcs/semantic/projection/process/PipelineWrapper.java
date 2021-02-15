@@ -29,12 +29,11 @@ import se.lth.cs.srl.corpus.Predicate;
 import se.lth.cs.srl.corpus.Word;
 import se.lth.cs.srl.pipeline.Pipeline;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 //import zalando.analytics.base.*;
@@ -65,7 +64,7 @@ class PipelineWrapper {
     private Logger logger = LogManager.getLogger(PipelineWrapper.class);
 
     //Server address where hosted the services
-    private String serverAddress = "34.123.37.137";
+    private String serverAddress;
 
     /**
      * Constructor for pipeline object. Require language to be specified.
@@ -75,6 +74,7 @@ class PipelineWrapper {
     PipelineWrapper(Language language) {
 
         this.language = language;
+        this.serverAddress = getServerAddress();
         String languageString = language.toString().substring(0, 1).toUpperCase() + language.toString().substring(1).toLowerCase();
 
         //---------------------------------
@@ -604,17 +604,27 @@ class PipelineWrapper {
      *
      * @return Properties object
      */
-    private Properties loadPropFile() {
-        String resourceName = "config.properties";      // property file to load server details
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        Properties props = new Properties();
-        try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
-            props.load(resourceStream);
-            logger.info("Successfully loaded 'config.properties' file...");
-        } catch (IOException e) {
-            logger.error("Error loading 'config.properties' file...");
+    private String getServerAddress() {
+        String resourceName = "config.conf";      // property file to load server details
+        String confFile = getResourceFileAsString(resourceName);
+
+        String serverAddress = confFile.split("=")[1];
+        return serverAddress;
+    }
+
+    public static String getResourceFileAsString(String fileName) {
+        InputStream is = getResourceFileAsInputStream(fileName);
+        if (is != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            return (String)reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        } else {
+            throw new RuntimeException("resource not found");
         }
-        return props;
+    }
+
+    public static InputStream getResourceFileAsInputStream(String fileName) {
+        ClassLoader classLoader = PipelineWrapper.class.getClassLoader();
+        return classLoader.getResourceAsStream(fileName);
     }
 
     /**

@@ -42,7 +42,7 @@ import java.util.zip.ZipFile;
  * semantic role labeling for various languages. The Language needs to be passed to the constructor, then the pipeline
  * is automatically set up.
  * <p>
- * Created by DCS Group on 8/28/17.
+ * Created by DCS Group on 01/28/21.
  */
 class PipelineWrapper {
 

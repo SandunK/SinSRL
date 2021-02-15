@@ -24,7 +24,7 @@ Below an example of an English (top) and Sinhala (bottom) sentence pair. English
  
 ##### Abstract architecture of the "සිංSRL" tool
 
-![alt text](https://github.com/SandunK/SinSRL/blob/master/images/architecture.png?raw=true)
+![alt text](https://github.com/SandunK/SinSRL/blob/master/images/architecture.jpg?raw=true)
 
 
 ### Usage

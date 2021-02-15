@@ -4,7 +4,7 @@
 
 Below an example of an English (top) and Sinhala (bottom) sentence pair. English annotations are automatically projected onto the Sinhala sentence, labeling it with named entities, semantic roles, and PoS tags.
 
-![alt text](https://github.com/SandunK/SinSRL/blob/master/images/projection.png?raw=true)
+![alt text](https://github.com/SandunK/SinSRL/blob/master/images/projection.jpg?raw=true)
 
 
 ### Getting Started

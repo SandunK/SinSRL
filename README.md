@@ -1,4 +1,4 @@
-# සිංSRL
+# සිංSRL - The Projector
 
 "[සිංSRL](http://www.colips.org/conferences/ialp2020/proceedings/papers/IALP2020_P51.pdf)" is the first ever Sinhala Semantic Role Labeler for the Sinhala language. This tool takes a Sinhala-Engish parallel sentence to output the Sinhala span based semantically annotated sentence. The tool facilitates us to *automatically generate linguistic resources (such as treebanks or propbanks) for the Sinhala language*, using a method referred to as annotation projection or annotation transfer.
 

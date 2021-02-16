@@ -36,3 +36,6 @@ Below an example of an English (top) and Sinhala (bottom) sentence pair. English
 - Add sentences into the input files `input.en` and `input.si`
 - Change the `serverAddress` in config.properties file according to the environment that the services are hosted
 - Run the Project
+
+```NOTE: Server_version_of_SinSRL directory consists the REST implementation of the project```
+

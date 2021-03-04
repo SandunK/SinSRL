@@ -1,8 +1,8 @@
 from flask import Flask, request
-from flair.data import Sentence
-from flair.models import SequenceTagger
+import PredicateObj
 
 app = Flask(__name__)
+tagger = PredicateObj
 
 
 @app.route('/', methods=['GET'])
@@ -13,20 +13,21 @@ def main():
 @app.route('/getpredicates', methods=['POST'])
 def getFrames():
     query_request = request.json
-    print (query_request)
+    print(query_request)
     sentenceStr = query_request["word"]
+    predicateString = tagger.getPredicates(sentenceStr)
     # make a sentence
-    sentence = Sentence(sentenceStr)
+    # sentence = Sentence(sentenceStr)
+    # 
+    # # load the NER tagger
+    # tagger = SequenceTagger.load('frame')
+    # 
+    # # run NER over sentence
+    # tagger.predict(sentence)
+    print(predicateString)
 
-    # load the NER tagger
-    tagger = SequenceTagger.load('frame')
-
-    # run NER over sentence
-    tagger.predict(sentence)
-    print (sentence.to_tagged_string())
-    
-    #return str(sentence.to_dict(tag_type='frame'))
-    return '{"sentence":"'+sentence.to_tagged_string()+'"}'
+    # return str(sentence.to_dict(tag_type='frame'))
+    return '{"sentence":"' + predicateString + '"}'
 
 
 if __name__ == '__main__':
